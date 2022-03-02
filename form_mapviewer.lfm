@@ -1,0 +1,33 @@
+object FormViewer: TFormViewer
+  Left = 680
+  Height = 639
+  Top = 262
+  Width = 989
+  Caption = 'MapViewer'
+  ClientHeight = 639
+  ClientWidth = 989
+  DesignTimePPI = 120
+  OnCreate = FormCreate
+  OnResize = FormResize
+  LCLVersion = '1.8.4.0'
+  object ScrollBox_Display: TScrollBox
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 5
+    Height = 629
+    Top = 5
+    Width = 744
+    HorzScrollBar.Page = 1
+    VertScrollBar.Page = 1
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
+    BorderSpacing.Right = 240
+    BorderSpacing.Bottom = 5
+    TabOrder = 0
+  end
+end
