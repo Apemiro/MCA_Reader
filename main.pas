@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Zstream, LazUtf8,
   StdCtrls, ComCtrls, Menus, Windows
-  {$ifndef insert}, Apiglio_Useful, Auf_Ram_Var, aufscript_frame, Apiglio_Tree,
+  {$ifndef insert}, Apiglio_Useful, Auf_Ram_Var, aufscript_frame, apiglio_tree,
   entities_definition, blocks_definition, mca_tile, mca_base, color_rule,
   selection_rule{$endif};
 
@@ -84,19 +84,15 @@ end;
 procedure Func_TileList_Export(Sender:TObject);
 var AufScpt:TAufScript;
     AAuf:TAuf;
-    filename:string;
+    filename,mode:string;
     TmpColorRule:TColorRule;
 begin
   AufScpt:=Sender as TAufScript;
   AAuf:=AufScpt.Auf as TAuf;
-  if AAuf.ArgsCount<2 then begin AufScpt.send_error('警告：参数不足，代码未执行。');exit end;
-  try
-    filename:=AufScpt.TryToString(AAuf.nargs[1]);
-  except
-    AufScpt.send_error('警告：参数转化字符串失败，代码未执行。');exit
-  end;
-
-  case lowercase(AAuf.args[2]) of
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToString(1, filename) then exit;
+  if not AAuf.TryArgToStrParam(2, ['raw','fix','exa','color'], false, mode) then exit;
+  case mode of
     'raw':MCA_Tile_List.Colorize('raw');
     'fix':MCA_Tile_List.Colorize('fix');
     'exa':MCA_Tile_List.Colorize('exaggerated');
@@ -107,7 +103,7 @@ begin
         MCA_Tile_List.Colorize('color',TmpColorRule);
         TmpColorRule.Free;
       end
-    else MCA_Tile_List.Colorize('raw');
+    else MCA_Tile_List.Colorize('raw'); //并不会触发
   end;
 
   //MCA_Tile_List.SaveToFile(filename+'.png');
@@ -122,12 +118,8 @@ var AufScpt:TAufScript;
 begin
   AufScpt:=Sender as TAufScript;
   AAuf:=AufScpt.Auf as TAuf;
-  if AAuf.ArgsCount<2 then begin AufScpt.send_error('警告：参数不足，代码未执行。');exit end;
-  try
-    filename:=AufScpt.TryToString(AAuf.nargs[1]);
-  except
-    AufScpt.send_error('警告：参数转化字符串失败，代码未执行。');exit
-  end;
+  if not AAuf.CheckArgs(2) then exit;
+  if not AAuf.TryArgToString(1, filename) then exit;
   //Entities_List.SaveToFile(filename);
   Entities_List.SaveAsShp(filename);
   AufScpt.writeln('已将实体列表保存在'+filename+'中。');
@@ -150,12 +142,8 @@ var AufScpt:TAufScript;
 begin
   AufScpt:=Sender as TAufScript;
   AAuf:=AufScpt.Auf as TAuf;
-  if AAuf.ArgsCount<2 then begin AufScpt.send_error('警告：参数不足，代码未执行。');exit end;
-  try
-    filename:=AufScpt.TryToString(AAuf.nargs[1]);
-  except
-    AufScpt.send_error('警告：参数转化字符串失败，代码未执行。');exit
-  end;
+  if not AAuf.CheckArgs(2) then exit;
+  if not AAuf.TryArgToString(2, filename) then exit;
 
   mca:=TMCA_Stream.Create;
   chunk:=TChunk_Stream.Create;
@@ -260,7 +248,8 @@ procedure Func_DoesMCAHasNotChunk(Sender:TObject);//xxx $8[],chunkNo,:label
 var AufScpt:TAufScript;
     AAuf:TAuf;
     arv:TAufRamVar;
-    chunk_number,addr:dword;
+    chunk_number:dword;
+    addr:pRam;
     obj:TObject;
 begin
   AufScpt:=Sender as TAufScript;
@@ -447,7 +436,7 @@ procedure Func_DoesTreeHasPalette(Sender:TObject);//xxx $8[],:label
 var AufScpt:TAufScript;
     AAuf:TAuf;
     arv:TAufRamVar;
-    addr:dword;
+    addr:pRam;
     obj:TObject;
     tmpBlock:TChunk_Block;
 begin
@@ -470,7 +459,7 @@ procedure Func_DoesTreeHasHeightMaps(Sender:TObject);//xxx $8[],:label
 var AufScpt:TAufScript;
     AAuf:TAuf;
     arv:TAufRamVar;
-    addr:dword;
+    addr:pRam;
     obj:TObject;
     tmpBlock:TChunk_Block;
 begin
@@ -949,17 +938,10 @@ var AufScpt:TAufScript;
 begin
   AufScpt:=Sender as TAufScript;
   AAuf:=AufScpt.Auf as TAuf;
-  if AAuf.ArgsCount<3 then begin AufScpt.send_error('警告：参数不足，代码未执行。');exit end;
-  try
-    filename:=AufScpt.TryToString(AAuf.nargs[1]);
-  except
-    AufScpt.send_error('警告：参数转化字符串失败，代码未执行。');exit
-  end;
-  try
-    dir:=AufScpt.TryToString(AAuf.nargs[2]);
-  except
-    AufScpt.send_error('警告：参数转化字符串失败，代码未执行。');exit
-  end;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToString(1, filename) then exit;
+  if not AAuf.TryArgToString(2, dir) then exit;
+
   if filename='' then begin
     AufScpt.send_error('警告：文件名不能为空，代码未执行。');exit
   end;
@@ -1024,31 +1006,31 @@ begin
     add_func('about',@Func_about,'','当前MCA Reader的版本信息');
     add_func('mapviewer',@Func_MapViewer,'','打开MapViewer');
 
-    add_func('mca.new',@Func_newMCA,'arv','创建一个mca内存，并将指针保存在arv');
+    add_func('mca.new',@Func_newMCA,'arv','创建一个mca内存，并将指针保存在arv',TMCA_Stream);
     add_func('mca.free',@Func_freeMCA,'arv','释放arv指向的mca内存');
     add_func('mca.load',@Func_loadMCA,'arv,filename','加载mca文件到mca内存');
     add_func('mca.no_chunk?',@Func_DoesMCAHasNotChunk,'arv,chunkNo,:label','如果mca没有指定区块则跳转至label');
 
-    add_func('chunk.new',@Func_newChunk,'arv','创建一个chunk内存，并将指针保存在arv');
+    add_func('chunk.new',@Func_newChunk,'arv','创建一个chunk内存，并将指针保存在arv',TChunk_Stream);
     add_func('chunk.free',@Func_freeChunk,'arv','释放arv指向的chunk内存');
     add_func('chunk.load',@Func_loadChunk,'arv,mca,chunkNo','从mca内存中提取第chunkNo个区块');
     add_func('chunk.decode',@Func_decodeChunk,'arv,tree','将arv指向的chunk内存中的NBT数据解析到tree中');
 
-    add_func('tree.new',@Func_newTree,'arv','创建一个tree结构，并将指针保存在arv');
+    add_func('tree.new',@Func_newTree,'arv','创建一个tree结构，并将指针保存在arv',TATree);
     add_func('tree.free',@Func_freeTree,'arv','释放arv指向的tree结构');
     add_func('tree.clear',@Func_clearTree,'arv','清空arv指向的tree结构');
     add_func('tree.to_json',@Func_Tree2Json,'arv,filename[,opt]','将arv指向的tree结构内容导出json到filename，opt="a"为分析模式');
     add_func('tree.has_palette?',@Func_DoesTreeHasPalette,'arv,:label','如果tree中的区块方块有Palette属性则跳转至label');
     add_func('tree.has_heightmaps?',@Func_DoesTreeHasHeightMaps,'arv,:label','如果tree中的区块方块有HeightMaps属性则跳转至label');
 
-    add_func('block.new',@Func_newBlock,'arv','创建一个block内存，并将指针保存在arv');
+    add_func('block.new',@Func_newBlock,'arv','创建一个block内存，并将指针保存在arv',TChunk_Block);
     add_func('block.free',@Func_freeBlock,'arv','释放arv指向的block内存');
     add_func('block.extract',@Func_extractBlock,'arv,tree','从tree中提取方块信息到arv指向的block内存');
     add_func('block.to_txt',@Func_Block2Txt,'arv','将arv指向的block内存导出到txt文件中');
     add_func('block.to_chk',@Func_Block2Chunk,'arv','将arv指向的block内存导出到chk文件中');
     add_func('block.heightmap.to_txt',@Func_BlockHeightMap2Txt,'arv','将arv指向的block内存中的高度图导出到chk文件中');
 
-    add_func('tile.new',@Func_newTile,'arv','创建一个tile列表，并将指针保存在arv');
+    add_func('tile.new',@Func_newTile,'arv','创建一个tile列表，并将指针保存在arv',TMCA_Tile_List);
     add_func('tile.free',@Func_freeTile,'arv','释放arv指向的tile列表');
     add_func('tile.getbiomes',@Func_getTile,'arv,blk,floor','从blk指向的block内存中解析地图切片');
     add_func('tile.getclip',@Func_getTile,'arv,blk,floor','从blk指向的block内存中解析地图切片');
@@ -1063,7 +1045,7 @@ begin
     add_func('tile.to_bmp',@Func_Tile2Bmp,'arv,filename','将arv指向的tile列表导出到bmp图片');
     add_func('tile.to_tif',@Func_Tile2Tiff,'arv,filename','将arv指向的tile列表导出到tif图片');
 
-    add_func('ents.new',@Func_newEnts,'arv','创建一个ents列表，并将指针保存在arv');
+    add_func('ents.new',@Func_newEnts,'arv','创建一个ents列表，并将指针保存在arv',TEntities);
     add_func('ents.free',@Func_freeEnts,'arv','释放arv指向的ents列表');
     add_func('ents.clear',@Func_clearEnts,'arv','清空arv指向的ents列表');
     add_func('ents.extract',@Func_extractEnts,'arv,tree','从tree中提取实体信息到arv指向的ents列表');

@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="14">
+    <Units Count="18">
       <Unit0>
         <Filename Value="MCA_Reader.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -53,53 +53,71 @@
         <ResourceBaseClass Value="Form"/>
       </Unit2>
       <Unit3>
-        <Filename Value="..\..\FPC_Unit\Auf\apiglio_useful.pas"/>
+        <Filename Value="entities_definition.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Apiglio_Useful"/>
       </Unit3>
       <Unit4>
-        <Filename Value="..\..\FPC_Unit\Auf\aufscript_command.pas"/>
+        <Filename Value="mca_tile.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit4>
       <Unit5>
-        <Filename Value="entities_definition.pas"/>
+        <Filename Value="color_rule.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit5>
       <Unit6>
-        <Filename Value="mca_tile.pas"/>
+        <Filename Value="mca_base.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit6>
       <Unit7>
-        <Filename Value="color_rule.pas"/>
+        <Filename Value="selection_rule.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit7>
       <Unit8>
-        <Filename Value="..\..\FPC_Unit\Tree\apiglio_tree.pas"/>
+        <Filename Value="blocks_definition.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Apiglio_Tree"/>
       </Unit8>
       <Unit9>
-        <Filename Value="..\..\FPC_Unit\FileAccess\SHP\apiglio_geo.pas"/>
+        <Filename Value="..\AufScript\aufscript_frame.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Apiglio_Geo"/>
+        <ComponentName Value="Frame_AufScript"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
       </Unit9>
       <Unit10>
-        <Filename Value="..\..\FPC_Unit\FileAccess\SHP\apiglio_shapefile.pas"/>
+        <Filename Value="..\AufScript\apiglio_useful.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Apiglio_ShapeFile"/>
+        <UnitName Value="Apiglio_Useful"/>
       </Unit10>
       <Unit11>
-        <Filename Value="mca_base.pas"/>
+        <Filename Value="..\AufScript\auf_ram_var.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="selection_rule.pas"/>
+        <Filename Value="..\AufScript\auftype\auf_type_array.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit12>
       <Unit13>
-        <Filename Value="blocks_definition.pas"/>
+        <Filename Value="..\AufScript\auftype\auf_type_base.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit13>
+      <Unit14>
+        <Filename Value="..\AufScript\aufkernel\kernel.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="..\FileAccess-SHP\apiglio_geo.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="..\FileAccess-SHP\apiglio_shapefile.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Apiglio_ShapeFile"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="apiglio_tree.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Apiglio_Tree"/>
+      </Unit17>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -110,7 +128,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\FPC_Unit\Auf;..\..\FPC_Unit\Tree;..\..\FPC_Unit\FileAccess\SHP"/>
+      <OtherUnitFiles Value="..\AufScript;..\FileAccess-SHP;..\AufScript\auftype;..\AufScript\aufkernel"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

@@ -6,7 +6,7 @@ unit mca_base;
 interface
 
 uses
-  Classes, SysUtils, Apiglio_Tree, blocks_definition, Zstream;
+  Classes, SysUtils, apiglio_tree, blocks_definition, Zstream;
 
 type
   TMCA_Stream=class
@@ -24,6 +24,7 @@ type
   public
     constructor Create;
     destructor Destroy;override;
+    class function AufTypeName:String;
   end;
 
   TChunk_Stream=class
@@ -42,6 +43,7 @@ type
   public
     constructor Create;
     destructor Destroy;override;
+    class function AufTypeName:String;
   end;
 
   TChunk_Block=class
@@ -113,6 +115,7 @@ type
   public
     constructor Create;
     destructor Destroy;override;
+    class function AufTypeName:String;
   end;//改成四个字节为一组，add blk dat nul（与TBitMap的BGRa格式统一）
 
 
@@ -184,6 +187,10 @@ begin
   inherited Destroy;
 end;
 
+class function TMCA_Stream.AufTypeName:String;
+begin
+  result:='mca';
+end;
 
 { TChunk_Stream }
 
@@ -382,6 +389,10 @@ begin
   inherited Destroy;
 end;
 
+class function TChunk_Stream.AufTypeName:String;
+begin
+  result:='chunk';
+end;
 
 { TChunk_Block }
 
@@ -938,6 +949,10 @@ begin
   inherited Destroy;
 end;
 
+class function TChunk_Block.AufTypeName:String;
+begin
+  result:='block';
+end;
 
 end.
 

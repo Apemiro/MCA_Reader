@@ -7,10 +7,10 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Apiglio_Useful, Apiglio_Tree, main, form_mapviewer,
-  entities_definition, blocks_definition, mca_tile, color_rule, mca_base,
-  selection_rule
-  { you can add units after this };
+  Forms, main, form_mapviewer, entities_definition, blocks_definition, mca_tile,
+  color_rule, mca_base, selection_rule, Apiglio_Tree, Apiglio_Useful,
+  auf_ram_var, aufscript_frame, kernel, auf_type_array, auf_type_base,
+  apiglio_geo, Apiglio_ShapeFile;
 
 {$R *.res}
 

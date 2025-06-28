@@ -163,6 +163,7 @@ end;
 initialization
 
   defaultBlocks:=TBlockList.Create;
+  {
   try
     defaultBlocks.LoadFromFile('defaultBlocks.txt');
   finally
@@ -182,10 +183,9 @@ initialization
     //defaultBlocks.AddBlockId('minecraft:gravel');
 
   end;
-
-
+  }
 finalization
-  defaultBlocks.SaveToFile('defaultBlocks.txt');
-
+  //defaultBlocks.SaveToFile('defaultBlocks.txt');
+  defaultBlocks.Free;
 end.
 

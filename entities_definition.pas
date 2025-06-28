@@ -6,7 +6,7 @@ unit entities_definition;
 interface
 
 uses
-  Classes, SysUtils, Apiglio_Useful, Apiglio_Tree;
+  Classes, SysUtils, Apiglio_Useful, apiglio_tree;
 
 type
   TEntityUnit=class
@@ -35,6 +35,7 @@ type
   public
     constructor Create;
     destructor Destroy;override;
+    class function AufTypeName:String;
   end;
 
 
@@ -199,7 +200,10 @@ begin
   inherited Destroy;
 end;
 
-
+class function TEntities.AufTypeName:String;
+begin
+  result:='ents';
+end;
 
 end.
 

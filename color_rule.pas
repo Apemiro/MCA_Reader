@@ -26,7 +26,7 @@ type
   end;
 
 implementation
-//uses Apiglio_Tree;
+//uses apiglio_tree;
 
 function TColorRule.GetBlockColor(id:word;data:byte):TColor;
 var p:pbyte;

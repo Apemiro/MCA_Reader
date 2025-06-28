@@ -71,10 +71,12 @@ type
     procedure SaveToFile(filename:string);
     procedure SaveAsTiff(filename_without_ext:string);
     procedure Colorize(mode:string;ColorRule:TColorRule=nil);
+  public
+    class function AufTypeName:String;
   end;
 
 implementation
-uses Apiglio_Tree;
+uses apiglio_tree;
 
 procedure TMCA_Tile.SetBlockId(x,z:integer;id:word);
 begin
@@ -698,6 +700,11 @@ begin
       'color':TMCA_Tile(Self.Items[pi]).Colorize_Rule(ColorRule);
       else TMCA_Tile(Self.Items[pi]).Colorize_Raw;
     end;
+end;
+
+class function TMCA_Tile_List.AufTypeName:String;
+begin
+  result:='tile';
 end;
 
 end.
