@@ -169,7 +169,7 @@ begin
         AufScpt.writeln('警告：mca['+IntToStr(mca.x)+','+IntToStr(mca.z)+'].chunk['+IntToStr(chunkN)+']读取失败。');
         tree.JsonFileMode:=jfmAnalysis;
         tree.PrintJSON;
-        tree.JsonFileMode:=jfmExchange;
+        tree.JsonFileMode:=jfmStored;
       end;
     end;
 
@@ -192,6 +192,16 @@ procedure Func_mapViewer(Sender:TObject);
 begin
   FormViewer.Show;
 end;
+
+procedure Func_viewPalette(Sender:TObject);
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  AufScpt.writeln(defaultBlocks.ExportToString(#13#10));
+end;
+
 
 procedure Func_newMCA(Sender:TObject);//xxx $8[]
 var AufScpt:TAufScript;
@@ -413,9 +423,9 @@ begin
   if not AAuf.TryArgToARV(1,8,8,[ARV_FixNum],arv) then exit;
   if not AAuf.TryArgToString(2,filename) then exit;
   if AAuf.ArgsCount>3 then begin
-    if not AAuf.TryArgToString(3,option) then exit;
+    if not AAuf.TryArgToStrParam(3,['analysis','stored','entries'],false,option) then exit;
   end else begin
-    option:='exchange';
+    option:='stored';
   end;
 
   obj:=TObject(pqword(arv.Head)^);
@@ -424,13 +434,40 @@ begin
       AufScpt.send_error('警告：第一个参数不能转化为TATree对象，代码未执行。');
       exit
     end;
-  if lowercase(option)[1]='a' then (obj as TATree).JsonFileMode:=jfmAnalysis;
+  case lowercase(option)[1] of
+    'a':(obj as TATree).JsonFileMode:=jfmAnalysis;
+    'e':(obj as TATree).JsonFileMode:=jfmEntries;
+    else (obj as TATree).JsonFileMode:=jfmStored;
+  end;
   try
     (obj as TATree).PrintJSON(filename+'.json');
   except
     AufScpt.send_error('警告：Json文件导出失败，请文件名是否有效且文件是否被占用。');
   end;
-  (obj as TATree).JsonFileMode:=jfmExchange;
+  (obj as TATree).JsonFileMode:=jfmStored;
+end;
+procedure Func_infoTree(Sender:TObject);
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+    tmp:TAListUnit;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(2) then exit;
+  if not AAuf.TryArgToObject(1,TATree,obj) then exit;
+  AufScpt.write('["');
+  with TATree(obj) do begin
+    CurrentInto(root.Achild.first.obj as TATreeUnit);
+    CurrentInto('Level');
+    tmp:=Current.Achild.first;
+    while tmp<>nil do begin
+      AufScpt.write(TATreeUnit(tmp.obj).name);
+      tmp:=tmp.next;
+      if tmp<>nil then AufScpt.write('","');
+    end;
+    AufScpt.writeln('"]');
+  end;
 end;
 procedure Func_DoesTreeHasPalette(Sender:TObject);//xxx $8[],:label
 var AufScpt:TAufScript;
@@ -482,7 +519,6 @@ begin
     end;
   tmpBlock.Free;
 end;
-
 
 procedure Func_newBlock(Sender:TObject);//xxx $8[]
 var AufScpt:TAufScript;
@@ -976,9 +1012,10 @@ begin
         AufScpt.writeln('警告：mca['+IntToStr(mca.x)+','+IntToStr(mca.z)+'].chunk['+IntToStr(chunkN)+']读取失败。');
         tree.JsonFileMode:=jfmAnalysis;
         tree.PrintJSON('error_tree.json');
-        tree.JsonFileMode:=jfmExchange;
+        tree.JsonFileMode:=jfmStored;
       end;
     end;
+  AufScpt.writeln(Format('number of entities: %d',[ents.Count]));
 
   filename:=ExtractFileName(filename);
   if pos('.mca',filename)=length(filename)-3 then delete(filename,length(filename)-3,4);
@@ -1006,6 +1043,8 @@ begin
     add_func('about',@Func_about,'','当前MCA Reader的版本信息');
     add_func('mapviewer',@Func_MapViewer,'','打开MapViewer');
 
+    add_func('palette.view',@Func_viewPalette,'','显示色板');
+
     add_func('mca.new',@Func_newMCA,'arv','创建一个mca内存，并将指针保存在arv',TMCA_Stream);
     add_func('mca.free',@Func_freeMCA,'arv','释放arv指向的mca内存');
     add_func('mca.load',@Func_loadMCA,'arv,filename','加载mca文件到mca内存');
@@ -1019,6 +1058,7 @@ begin
     add_func('tree.new',@Func_newTree,'arv','创建一个tree结构，并将指针保存在arv',TATree);
     add_func('tree.free',@Func_freeTree,'arv','释放arv指向的tree结构');
     add_func('tree.clear',@Func_clearTree,'arv','清空arv指向的tree结构');
+    add_func('tree.info',@Func_infoTree,'arv','查看arv指向的tree结构目录');
     add_func('tree.to_json',@Func_Tree2Json,'arv,filename[,opt]','将arv指向的tree结构内容导出json到filename，opt="a"为分析模式');
     add_func('tree.has_palette?',@Func_DoesTreeHasPalette,'arv,:label','如果tree中的区块方块有Palette属性则跳转至label');
     add_func('tree.has_heightmaps?',@Func_DoesTreeHasHeightMaps,'arv,:label','如果tree中的区块方块有HeightMaps属性则跳转至label');

@@ -1,0 +1,19 @@
+define inp_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506220020 - forEditing\region"
+define oup_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506220020 - forEditing\MCA_Reader"
+var string fn 1024
+
+fs = file.list @inp_path, "*.mca"
+
+fs . empty? :exit
+loo:
+    fs . draw @fn
+    println @fn
+    geof @fn, @oup_path
+    fs . empty? :exit
+jmp :loo
+
+exit:
+    unvar fn
+end
+
+//geof "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506220020 - forEditing\region"

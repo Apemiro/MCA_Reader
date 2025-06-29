@@ -1,4 +1,5 @@
 //{$define insert}
+//这里widestring、utf8string和string混用如同地狱
 
 unit Apiglio_Tree;
 
@@ -119,7 +120,7 @@ type
     destructor Destroy;override;
   end;
 
-  TJsonFileMode=(jfmExchange=0,jfmAnalysis=1);
+  TJsonFileMode=(jfmStored=0,jfmAnalysis=1,jfmEntries=2);
   TATree=class
     root:TATreeUnit;
     Current:TATreeUnit;
@@ -474,7 +475,7 @@ begin
   write(ATree.JSON_file,level_space(level));
   if AParent=nil then
     begin
-      IF ATree.JsonFileMode=jfmAnalysis THEN BEGIN
+      IF ATree.JsonFileMode<>jfmStored THEN BEGIN
         write(ATree.JSON_file,NBT_FullTypist(NbtType)+'('+''''+name+''''+'):');
       END ELSE BEGIN
         write(ATree.JSON_file,'"'+name+'":');
@@ -488,19 +489,19 @@ begin
   }
   else if AParent.NbtType=NBT_List then
     begin
-      IF ATree.JsonFileMode=jfmAnalysis THEN BEGIN
+      IF ATree.JsonFileMode<>jfmStored THEN BEGIN
         write(ATree.JSON_file,NBT_FullTypist(NbtType)+'('+'None'+'):');
       END;
     end
   else
     begin
-      IF ATree.JsonFileMode=jfmAnalysis THEN BEGIN
+      IF ATree.JsonFileMode<>jfmStored THEN BEGIN
       write(ATree.JSON_file,NBT_FullTypist(NbtType)+'('+''''+name+''''+'):');
       END ELSE BEGIN
       write(ATree.JSON_file,'"'+name+'":');
       END;
     end;
-  IF ATree.JsonFileMode=jfmAnalysis THEN BEGIN
+  IF ATree.JsonFileMode<>jfmStored THEN BEGIN
     case NbtType of
       NBT_Compound,NBT_List:
         begin
@@ -532,6 +533,7 @@ begin
       //
     end;
 
+  IF ATree.JsonFileMode<>jfmEntries THEN BEGIN
   IF {(stream=nil)and(NbtType<>NBT_List)and(NbtType<>NBT_Compound)}false THEN write(ATree.JSON_file,'unassigned')
   ELSE BEGIN
     if (stream<>nil) then stream.position:=0;
@@ -599,6 +601,8 @@ begin
     else ;
   end;
 
+
+  END;
 
   END;
 
@@ -802,13 +806,15 @@ end;
 
 function TATree.CurrentInto(varname:widestring):boolean;
 var tmp:TAListUnit;
+    tmp_name:utf8string;
 begin
   result:=false;
   if Current.Achild.count=0 then exit;
   tmp:=Current.Achild.last{first};
   while tmp<>nil do
     begin
-      if (tmp.obj as TATreeUnit).name=varname then
+      tmp_name:=(tmp.obj as TATreeUnit).name;
+      if tmp_name=varname then
         begin
           Current:=(tmp.obj as TATreeUnit);
           result:=true;

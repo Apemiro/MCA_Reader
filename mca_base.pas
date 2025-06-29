@@ -1,8 +1,8 @@
 unit mca_base;
 
 {$mode objfpc}{$H+}
-{$inline on}
-
+//{$inline on}
+{$inline off}
 interface
 
 uses
@@ -94,6 +94,8 @@ type
     //用于判断是否是扁平化之后的版本，仅接受唯一（第1个）chunk
     function HasHeightMaps(tree:TATree):boolean;inline;
     //用于判断是否是有多个高度图的版本，仅接受唯一（第1个）chunk
+    function HasBlockStates(tree:TATree):boolean;inline;
+    //用于判断是否是1.18及之后的版本，仅接受唯一（第1个）chunk
 
 
 
@@ -102,6 +104,7 @@ type
     function ExtractBiomes(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractBlocks_164(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractBlocks_1_13(tree:TATree):boolean;//仅接受唯一（第1个）chunk
+    function ExtractBlocks_1_18(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractHeightMap_164(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractHeightMap_1_13(tree:TATree):boolean;//仅接受唯一（第1个）chunk
 
@@ -120,6 +123,7 @@ type
 
 
 implementation
+uses Dialogs;
 
 { TMCA_Stream }
 
@@ -490,6 +494,16 @@ begin
   else result:=false;
 end;
 
+function TChunk_Block.HasBlockStates(tree:TATree):boolean;inline;
+var tmp:TAListUnit;
+begin
+  tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
+  tree.CurrentInto('Level');//21w43a之后取消Level层级，无tag时不影响后续逻辑
+  if not tree.CurrentInto('sections') then exit;
+  tmp:=tree.Current.Achild.first;
+  tree.CurrentInto(tmp.obj as TATreeUnit);
+  result:=tree.CurrentInto('block_states');
+end;
 
 function TChunk_Block.ExtractBlocks_164(tree:TATree):boolean;
 var tmp:TAListUnit;
@@ -674,8 +688,6 @@ begin
               end;
           end;
       end else if tree.Current.size = bsh*64 then begin //1.13
-
-
         getmem(mem,36*8+1);
         for pi:=0 to bsh*64-1 do
           (pint64(mem)+(bsh*64-1-pi))^:=tree.Current.RLongArray[pi];
@@ -688,6 +700,116 @@ begin
           end;
         freemem(mem,36*8+1);
 
+      end else begin assert(false,'BlockStates位数不正确');exit end;
+
+      tmp:=tmp.next;
+    end;
+  result:=true;
+end;
+
+function TChunk_Block.ExtractBlocks_1_18(tree:TATree):boolean;
+var tmp,palette_unit:TAListUnit;
+    SectionsId:byte;
+    palette_count,pi:dword;
+    block_defs:array[0..4095]of integer;
+    band,buffer,bindex:int64;
+    btimes,bsh:byte;
+    mem:pbyte;
+
+    function ceil(inp:double):int64;
+    begin
+      if inp=trunc(inp) then result:=trunc(inp)
+      else result:=trunc(inp)+1;
+    end;
+
+begin
+  result:=false;
+  FStream.SetSize(16*16*256*4);
+  FStream.position:=0;
+
+  while FStream.position<FStream.Size do
+    begin
+      FStream.WriteQWord($0000000000000000);
+    end;
+  tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
+  tree.CurrentInto('Level'); //21w39a之后Level取消，可进可不进
+  if not tree.CurrentInto('sections') then raise Exception.Create('sections');
+  tmp:=tree.Current.AChild.first;
+  while tmp<>nil do
+    begin
+      tree.CurrentInto(tmp.obj as TATreeUnit);
+      tree.CurrentInto('Y');
+      SectionsId:=tree.Current.AByte;
+      tree.CurrentOut;
+
+      if not tree.CurrentInto('block_states') then raise Exception.Create('block_states');
+      if tree.CurrentInto('palette') then
+        begin
+          palette_unit:=tree.Current.Achild.first;
+          pi:=0;
+          while palette_unit<>nil do
+            begin
+              tree.CurrentInto(palette_unit.obj as TATreeUnit);
+              tree.CurrentInto('Name');
+              block_defs[pi]:=defaultBlocks.AddBlockId(tree.Current.AString);
+              inc(pi);
+              palette_unit:=palette_unit.next;
+            end;
+          palette_count:=pi;
+        end
+      else
+        begin
+          //没有方块索引的子区块直接退出，相当于全部是minecraft:air
+          block_defs[0]:=defaultBlocks.AddBlockId('minecraft:air');
+          FStream.position:=SectionsId*4096*4+0;
+          for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+          tmp:=tmp.next;
+          continue;
+        end;
+
+      tree.CurrentOut;//Palette[i]
+      tree.CurrentOut;//Palette
+      tree.CurrentOut;//Sections
+
+      if not tree.CurrentInto('data') then begin
+        FStream.position:=SectionsId*4096*4+0;
+        for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+        tmp:=tmp.next;
+        continue; // 无data就用Palette[0]填充整个子区块
+      end;
+
+      if palette_count<=16 then begin
+        band:=$000000000000000F;btimes:=15;bsh:=4;
+      end else if palette_count<=32 then begin
+        band:=$000000000000001F;btimes:=11;bsh:=5;
+      end else if palette_count<=64 then begin
+        band:=$000000000000003F;btimes:=9;bsh:=6;
+      end else if palette_count<=128 then begin
+        band:=$000000000000007F;btimes:=8;bsh:=7;
+      end else if palette_count<=256 then begin
+        band:=$00000000000000FF;btimes:=7;bsh:=8;
+      end else if palette_count<=512 then begin
+        band:=$00000000000001FF;btimes:=6;bsh:=9;
+      end else if palette_count<=1024 then begin
+        band:=$00000000000003FF;btimes:=5;bsh:=10;
+      end else if palette_count<=2048 then begin
+        band:=$00000000000007FF;btimes:=4;bsh:=11;
+      end else begin
+        band:=$0000000000000FFF;btimes:=4;bsh:=12;
+      end;
+
+      if tree.Current.size = ceil(4096/(btimes+1)) then begin //1.16
+        FStream.position:=SectionsId*4096*4+0;
+        for pi:=0 to tree.Current.size do
+          begin
+            buffer:=tree.Current.ALongArray[pi];
+            buffer:=SwapEndian(buffer);
+            for bindex:=0 to btimes do
+              begin
+                FStream.WriteDWord(block_defs[buffer and band]);
+                buffer:=buffer shr bsh;
+              end;
+          end;
       end else begin assert(false,'BlockStates位数不正确');exit end;
 
       tmp:=tmp.next;
@@ -861,8 +983,10 @@ begin
     if not ExtractHeightMap_164(tree) then exit;
   end;
 
-  if HasPalette(tree) then begin
+  if HasPalette(tree) then begin //Sections[*]中有Palette
     if not ExtractBlocks_1_13(tree) then exit;
+  end else if HasBlockStates(tree) then begin
+    if not ExtractBlocks_1_18(tree) then exit;
   end else begin
     if not ExtractBlocks_164(tree) then exit;
   end;

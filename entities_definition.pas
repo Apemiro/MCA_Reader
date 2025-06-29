@@ -116,8 +116,8 @@ var tmp:TAListUnit;
 begin
 
   tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
-  if not tree.CurrentInto('Level') then exit;
-  if not tree.CurrentInto('Entities') then exit;
+  tree.CurrentInto('Level'); //21w39a展开了Level层
+  if not tree.CurrentInto('Entities') then if not tree.CurrentInto('entities') then exit; //21w43a重命名Entities为entities
   tmp:=tree.Current.AChild.first;
   while tmp<>nil do
     begin

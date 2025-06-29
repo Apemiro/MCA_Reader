@@ -1,0 +1,57 @@
+define inp_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\region"
+define oup_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\MCA_Reader"
+define mca_test "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\region\r.-3.0.mca"
+define oup_json "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\MCA_Reader\entries"
+define oup_text "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\MCA_Reader\chunk_text"
+var string fn 1024
+var string fout 1024
+var int cid
+var object mca
+var object chk
+var object tree
+var object blk
+
+mca.new       @mca
+mca.load      @mca,   @mca_test
+
+mov @cid, 0
+loo:
+
+    fmt @fout, @oup_json, "[", @cid, "]"
+    println @fout
+
+    chunk.new     @chk
+    tree.new      @tree
+//    block.new     @blk
+
+
+
+    chunk.load    @chk,   @mca,      @cid
+    chunk.decode  @chk,   @tree
+    tree.info     @tree
+//    tree.to_json  @tree,  @fout, "entries"
+//    block.extract @blk,   @tree
+//    block.to_txt  @blk,   @oup_text
+
+
+
+    chunk.free    @chk
+    tree.free     @tree
+//    block.free    @blk
+
+add @cid, 1
+loop :loo, 1023
+exit:
+
+mca.free      @mca
+
+unvar mca
+unvar chk
+unvar tree
+unvar blk
+unvar fn
+unvar fout
+unvar cid
+
+
+end

@@ -14,6 +14,7 @@ type
   public
     procedure LoadFromFile(filename:string);
     procedure SaveToFile(filename:string);
+    function ExportToString(Delimiter:string=','):string;
     function FindBlockId(block_name:string):Integer;
     function AddBlockId(block_name:string):Integer;
   public
@@ -58,6 +59,19 @@ end;
 procedure TBlockList.SaveToFile(filename:string);
 begin
   Self.FBlockList.SaveToFile(filename);
+end;
+function TBlockList.ExportToString(Delimiter:string=','):string;
+var stmp:string;
+    itmp,dlen:integer;
+begin
+  result:='';
+  itmp:=0;
+  for stmp in Self.FBlockList do begin
+    result:=result+Delimiter+IntToStr(itmp)+': '+stmp;
+    inc(itmp);
+  end;
+  dlen:=length(Delimiter);
+  if itmp>0 then System.Delete(result,length(result)-dlen+1,dlen);
 end;
 
 function TBlockList.FindBlockId(block_name:string):Integer;
