@@ -1,6 +1,6 @@
 define inp_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\region"
 define oup_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\MCA_Reader"
-define mca_test "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\region\r.-2.0.mca"
+define mca_test "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\region\r.0.0.mca"
 define oup_json "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\MCA_Reader\analysis"
 define oup_text "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\MCA_Reader\chunk_text"
 var string fn 1024
@@ -10,19 +10,20 @@ var object chk
 var object tree
 var object blk
 
-mov @cid, 96
+mov @cid, 192
 
 mca.new       @mca
 chunk.new     @chk
 tree.new      @tree
 block.new     @blk
 
-mca.no_chunk? @mca,   @cid,      :continue
 mca.load      @mca,   @mca_test
+mca.no_chunk? @mca,   @cid,      :continue
 chunk.load    @chk,   @mca,      @cid
 chunk.decode  @chk,   @tree
 tree.to_json  @tree,  @oup_json, "analysis"
 block.extract @blk,   @tree
+block.to_chk  @blk,   @oup_text
 block.to_txt  @blk,   @oup_text
 
 println "已导出（如果没有输出则表示没有该区块）"

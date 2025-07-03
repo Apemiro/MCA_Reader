@@ -1,0 +1,7 @@
+define inp_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\region"
+define mca_file "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\region\r.-3.0.mca"
+define oup_path "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202506280550 - forEditing\MCA_Reader"
+
+
+geof @mca_file @oup_path
+palette.view

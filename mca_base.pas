@@ -49,6 +49,7 @@ type
   TChunk_Block=class
   private
     FStream:TMemoryStream;
+    FSBelow:TMemoryStream;//0坐标以下的方块
     FBiomes:TMemoryStream;
     FMB,FMBN,FOF,FOFW,FWS,FWSW:array[0..256]of word;//高度图，其中第256位为0表示高度图无效
     xPos,zPos:longint;
@@ -69,6 +70,7 @@ type
 
   public
     property Stream:TMemoryStream read FStream write FStream;
+    property SBelow:TMemoryStream read FSBelow write FSBelow;
     property Biomes:TMemoryStream read FBiomes write FBiomes;
     property motion_blocking[block_index:byte]:word read GetHeightMap_MB write SetHeightMap_MB;
     property motion_blocking_on_leaves[block_index:byte]:word read GetHeightMap_MBN write SetHeightMap_MBN;
@@ -709,12 +711,13 @@ end;
 
 function TChunk_Block.ExtractBlocks_1_18(tree:TATree):boolean;
 var tmp,palette_unit:TAListUnit;
-    SectionsId:byte;
+    SectionsId:ShortInt;
     palette_count,pi:dword;
     block_defs:array[0..4095]of integer;
     band,buffer,bindex:int64;
     btimes,bsh:byte;
     mem:pbyte;
+    pStream:TMemoryStream;
 
     function ceil(inp:double):int64;
     begin
@@ -724,13 +727,15 @@ var tmp,palette_unit:TAListUnit;
 
 begin
   result:=false;
-  FStream.SetSize(16*16*256*4);
+  FStream.SetSize(16*16*384*4);
   FStream.position:=0;
+  FSBelow.SetSize(16*16*64*4);
+  FSBelow.Position:=0;
 
-  while FStream.position<FStream.Size do
-    begin
-      FStream.WriteQWord($0000000000000000);
-    end;
+  while FStream.position<FStream.Size do FStream.WriteQWord($0000000000000000);
+  while FSBelow.position<FSBelow.Size do FSBelow.WriteQWord($0000000000000000);
+  defaultBlocks.AddBlockId('minecraft:air');//强制设置0为空气方块
+
   tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
   tree.CurrentInto('Level'); //21w39a之后Level取消，可进可不进
   if not tree.CurrentInto('sections') then raise Exception.Create('sections');
@@ -761,8 +766,13 @@ begin
         begin
           //没有方块索引的子区块直接退出，相当于全部是minecraft:air
           block_defs[0]:=defaultBlocks.AddBlockId('minecraft:air');
-          FStream.position:=SectionsId*4096*4+0;
-          for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+          if SectionsId>=0 then begin
+            FStream.position:=SectionsId*4096*4+0;
+            for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+          end else begin
+            FSBelow.position:=(-SectionsId-1)*4096*4+0;
+            for pi:=0 to 4095 do FSBelow.WriteDWord(block_defs[0]);
+          end;
           tmp:=tmp.next;
           continue;
         end;
@@ -772,8 +782,13 @@ begin
       tree.CurrentOut;//Sections
 
       if not tree.CurrentInto('data') then begin
-        FStream.position:=SectionsId*4096*4+0;
-        for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+        if SectionsId>=0 then begin
+          FStream.position:=SectionsId*4096*4+0;
+          for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+        end else begin
+          FSBelow.position:=(-SectionsId-1)*4096*4+0;
+          for pi:=0 to 4095 do FSBelow.WriteDWord(block_defs[0]);
+        end;
         tmp:=tmp.next;
         continue; // 无data就用Palette[0]填充整个子区块
       end;
@@ -799,14 +814,20 @@ begin
       end;
 
       if tree.Current.size = ceil(4096/(btimes+1)) then begin //1.16
-        FStream.position:=SectionsId*4096*4+0;
+        if SectionsId>=0 then begin
+          pStream:=FStream;
+          pStream.position:=SectionsId*4096*4+0;
+        end else begin
+          pStream:=FSBelow;
+          pStream.position:=(-SectionsId-1)*4096*4+0;
+        end;
         for pi:=0 to tree.Current.size do
           begin
             buffer:=tree.Current.ALongArray[pi];
             buffer:=SwapEndian(buffer);
             for bindex:=0 to btimes do
               begin
-                FStream.WriteDWord(block_defs[buffer and band]);
+                pStream.WriteDWord(block_defs[buffer and band]);
                 buffer:=buffer shr bsh;
               end;
           end;
@@ -1003,6 +1024,19 @@ begin
   rewrite(f);
   write(f,'[');
   FStream.Position:=0;
+  FSBelow.Position:=0;
+  while FSBelow.Position<FSBelow.Size do
+    begin
+      write(f,'[');
+      write(f,FSBelow.ReadByte);
+      write(f,',');
+      write(f,FSBelow.ReadByte);
+      write(f,',');
+      write(f,FSBelow.ReadByte);
+      write(f,',');
+      write(f,FSBelow.ReadByte);
+      write(f,'],');
+    end;
   while FStream.Position<FStream.Size do
     begin
       if FStream.Position<>0 then write(f,',');
@@ -1020,8 +1054,19 @@ begin
   closefile(f);
 end;
 procedure TChunk_Block.SaveByteToFile(filename:string);
+var tmpMemory:TMemoryStream;
 begin
-  FStream.SaveToFile(filename);
+  tmpMemory:=TMemoryStream.Create;
+  try
+    tmpMemory.Position:=0;
+    FStream.Position:=0;
+    FSBelow.Position:=0;
+    if FSBelow.Size>0 then tmpMemory.WriteBuffer(FSBelow.Memory^,FSBelow.Size);
+    if FStream.Size>0 then tmpMemory.WriteBuffer(FStream.Memory^,FStream.Size);
+    tmpMemory.SaveToFile(filename);
+  finally
+    tmpMemory.Free;
+  end;
 end;
 procedure TChunk_Block.SaveHeightMapToFile(filename:string);
 var f:text;
@@ -1057,6 +1102,7 @@ constructor TChunk_Block.Create;
 begin
   inherited Create;
   FStream:=TMemoryStream.Create;
+  FSBelow:=TMemoryStream.Create;
   FBiomes:=TMemoryStream.Create;
   FMB[256]:=0;
   FMBN[256]:=0;
@@ -1069,6 +1115,7 @@ end;
 destructor TChunk_Block.Destroy;
 begin
   FStream.Free;
+  FSBelow.Free;
   FBiomes.Free;
   inherited Destroy;
 end;

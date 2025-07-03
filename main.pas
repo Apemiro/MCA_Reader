@@ -1003,10 +1003,10 @@ begin
         tree.Clear;
         chunk.Decode(tree);
         blocks.LoadFromTree(tree);
-        block_tile_list.GetChunkPlan(blocks,'top',0,Byte(smExclude),sel);
-        //block_tile_list.GetChunkPlan(blocks,'clip',54,Byte(smExclude),sel);
+        block_tile_list.GetChunkPlan(blocks,'above',65,Byte(smExclude),sel);
+        //block_tile_list.GetChunkPlan(blocks,'clip',-59,Byte(smExclude),sel);
         //block_tile_list.GetChunkPlan(blocks,'biomes',54,Byte(smExclude),sel);
-        height_tile_list.GetChunkPlan(blocks,'realheight',0,Byte(smExclude),sel);
+        //height_tile_list.GetChunkPlan(blocks,'realheight',0,Byte(smExclude),sel);
         ents.LoadFromTree(tree);
       except
         AufScpt.writeln('警告：mca['+IntToStr(mca.x)+','+IntToStr(mca.z)+'].chunk['+IntToStr(chunkN)+']读取失败。');
@@ -1015,13 +1015,13 @@ begin
         tree.JsonFileMode:=jfmStored;
       end;
     end;
-  AufScpt.writeln(Format('number of entities: %d',[ents.Count]));
+  //AufScpt.writeln(Format('number of entities: %d',[ents.Count]));
 
   filename:=ExtractFileName(filename);
   if pos('.mca',filename)=length(filename)-3 then delete(filename,length(filename)-3,4);
   block_tile_list.SaveAsTiff(dir+'\'+filename+'_block');
-  height_tile_list.SaveAsTiff(dir+'\'+filename+'_height');
-  ents.SaveAsShp(dir+'\'+filename+'_entities');
+  //height_tile_list.SaveAsTiff(dir+'\'+filename+'_height');
+  //ents.SaveAsShp(dir+'\'+filename+'_entities');
 
   ents.Free;
   height_tile_list.Free;

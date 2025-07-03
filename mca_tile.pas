@@ -39,12 +39,12 @@ type
     procedure GetAbove(chunkblock:TMemoryStream;y:byte);//从chunkblock提取方块平面图，使用前要使用SetOffset
     }
     procedure GetBiomesClip(block:TChunk_Block;y:byte);
-    procedure GetClip(block:TChunk_Block;y:byte);
+    procedure GetClip(block:TChunk_Block;y:integer);
     procedure GetSurface(block:TChunk_Block;mode:string='ws');
     procedure GetHeight(block:TChunk_Block;mode:string='ws');//通过高度图获得
     procedure GetRealHeight(block:TChunk_Block;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);//通过搜索获得
-    procedure GetBelow(block:TChunk_Block;y:byte;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
-    procedure GetAbove(block:TChunk_Block;y:byte;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
+    procedure GetBelow(block:TChunk_Block;y:integer;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
+    procedure GetAbove(block:TChunk_Block;y:integer;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
     procedure GetDensity(block:TChunk_Block;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
 
   public
@@ -65,7 +65,7 @@ type
   public
     property Tile[x,z:integer]:TMCA_Tile read GetTile;
   public
-    procedure GetChunkPlan(blocks:TChunk_Block;mode:string;param1:word=0;param2:word=0;param3:TObject=nil);//mode=clip,below,above,height,density...
+    procedure GetChunkPlan(blocks:TChunk_Block;mode:string;param1:integer=0;param2:integer=0;param3:TObject=nil);//mode=clip,below,above,height,density...
 
   public
     procedure SaveToFile(filename:string);
@@ -204,20 +204,28 @@ begin
     end;
 end;
 
-procedure TMCA_Tile.GetClip(block:TChunk_Block;y:byte);
+procedure TMCA_Tile.GetClip(block:TChunk_Block;y:integer);
 var x,z:byte;
     adapter:dword;
+    pStream:TMemoryStream;
 begin
-  block.Stream.position:=y*256*4;
-  z:=0;x:=0;
-  while z<16 do
-    begin
-      adapter:=block.Stream.ReadDWord;
-      pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
-      inc(x);
-      if x=16 then
-        begin
-          x:=0;inc(z);
+    if y>=0 then begin
+        pStream:=block.Stream;
+        pStream.Position:=y*256*4;
+    end else begin
+        pStream:=block.SBelow;
+        pStream.Position:=-((y+1) div 16) shl 14 + (y+1) mod 16 shl 10;
+        //pStream.Position:=4096*4*-((y+1) div 16) + 256*4*((y+1) mod 16);
+    end;
+    z:=0;
+    x:=0;
+    while z<16 do begin
+        adapter:=pStream.ReadDWord;
+        pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
+        inc(x);
+        if x=16 then begin
+            x:=0;
+            inc(z);
         end;
     end;
 end;
@@ -335,55 +343,67 @@ begin
         end;
     end;
 end;
-procedure TMCA_Tile.GetBelow(block:TChunk_Block;y:byte;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
-var x,z,yy:byte;
+procedure TMCA_Tile.GetBelow(block:TChunk_Block;y:integer;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
+var x,z:byte;
+    yy,min_y:integer;
     adapter:dword;
 begin
-  block.Stream.position:=y*256*4;
-  z:=0;x:=0;
-  while z<16 do
-    begin
-      yy:=y;
-      repeat
-        block.Stream.position:=(yy*256+z*16+x)*4;
-        adapter:=block.Stream.ReadDWord;
-        if sel<>nil then case sel_mode of
-          smExclude: adapter:=sel.ExcludeSelection[adapter];
-          smJust:    adapter:=sel.JustSelection[adapter];
-        end;
-        pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
-        dec(yy);
-      until (adapter and $00ffffff<>0) or (yy=255);
-      inc(x);
-      if x=16 then
-        begin
-          x:=0;inc(z);
+    min_y:=-block.SBelow.Size div (256*4);
+    z:=0;
+    x:=0;
+    while z<16 do begin
+        yy:=y;
+        repeat
+            if yy>=0 then begin
+                block.Stream.position:=(yy*256+z*16+x)*4;
+                adapter:=block.Stream.ReadDWord;
+            end else begin
+                block.SBelow.position:=-((yy+1) div 16) shl 14 + ((yy+16) mod 16) shl 10 + (z*16+x)*4;
+                adapter:=block.SBelow.ReadDWord;
+            end;
+            if sel<>nil then case sel_mode of
+                smExclude: adapter:=sel.ExcludeSelection[adapter];
+                smJust:    adapter:=sel.JustSelection[adapter];
+            end;
+            pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
+            dec(yy);
+        until (adapter and $00ffffff<>0) or (yy=min_y);
+        inc(x);
+        if x=16 then begin
+            x:=0;
+            inc(z);
         end;
     end;
 end;
-procedure TMCA_Tile.GetAbove(block:TChunk_Block;y:byte;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
-var x,z,yy:byte;
+procedure TMCA_Tile.GetAbove(block:TChunk_Block;y:integer;sel:TSelectionRule=nil;sel_mode:TSelectionMode=smExclude);
+var x,z:byte;
+    yy,max_y:integer;
     adapter:dword;
 begin
-  block.Stream.position:=y*256*4;
-  z:=0;x:=0;
-  while z<16 do
-    begin
-      yy:=y;
-      repeat
-        block.Stream.position:=(yy*256+z*16+x)*4;
-        adapter:=block.Stream.ReadDWord;
-        if sel<>nil then case sel_mode of
-          smExclude: adapter:=sel.ExcludeSelection[adapter];
-          smJust:    adapter:=sel.JustSelection[adapter];
-        end;
-        pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
-        inc(yy);
-      until (adapter and $00ffffff<>0) or (yy=0);
-      inc(x);
-      if x=16 then
-        begin
-          x:=0;inc(z);
+    max_y:=block.Stream.Size div (256*4) - 1;
+    z:=0;
+    x:=0;
+    while z<16 do begin
+        yy:=y;
+        repeat
+            if yy>=0 then begin
+                block.Stream.position:=(yy*256+z*16+x)*4;
+                adapter:=block.Stream.ReadDWord;
+            end else begin
+                block.SBelow.position:=-((yy+1) div 16) shl 14 + ((yy+16) mod 16) shl 10 + (z*16+x)*4;
+                adapter:=block.SBelow.ReadDWord;
+            end;
+            if sel<>nil then case sel_mode of
+                smExclude: adapter:=sel.ExcludeSelection[adapter];
+                smJust:    adapter:=sel.JustSelection[adapter];
+            end;
+            pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
+            inc(yy);
+        until (adapter and $00ffffff<>0) or (yy=max_y);
+        inc(x);
+        if x=16 then begin
+            x:=0;
+            inc(z);
         end;
     end;
 end;
@@ -514,7 +534,7 @@ begin
 end;
 
 
-procedure TMCA_Tile_List.GetChunkPlan(blocks:TChunk_Block;mode:string;param1:word=0;param2:word=0;param3:TObject=nil);
+procedure TMCA_Tile_List.GetChunkPlan(blocks:TChunk_Block;mode:string;param1:integer=0;param2:integer=0;param3:TObject=nil);
 var mca_x,mca_z,ofs_x,ofs_z:longint;
     tmp_tile:TMCA_Tile;
 begin
