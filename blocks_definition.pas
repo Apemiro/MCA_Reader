@@ -74,7 +74,7 @@ begin
     inc(itmp);
   end;
   dlen:=length(Delimiter);
-  if itmp>0 then System.Delete(result,length(result)-dlen+1,dlen);
+  //if itmp>0 then System.Delete(result,length(result)-dlen+1,dlen);//删除最后一个分隔符计算错误，也不需要删除
 end;
 
 function TBlockList.FindBlockId(block_name:string):Integer;

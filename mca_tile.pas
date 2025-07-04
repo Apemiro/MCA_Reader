@@ -196,7 +196,7 @@ begin
         pStream.Position:=y*256*4;
     end else begin
         pStream:=block.BiomesBelow;
-        pStream.Position:=-((y+1) div 16) shl 14 + (y+1) mod 16 shl 10;
+        pStream.Position:=-((y+1) div 16) shl 14 + (y+17) mod 16 shl 10;
     end;
     z:=0;
     x:=0;
@@ -221,7 +221,7 @@ begin
         pStream.Position:=y*256*4;
     end else begin
         pStream:=block.SBelow;
-        pStream.Position:=-((y+1) div 16) shl 14 + (y+1) mod 16 shl 10;
+        pStream.Position:=-((y+1) div 16) shl 14 + (y+17) mod 16 shl 10;
         //pStream.Position:=4096*4*-((y+1) div 16) + 256*4*((y+1) mod 16);
     end;
     z:=0;

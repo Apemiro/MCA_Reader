@@ -38,6 +38,7 @@ type
     property zPos:longint read FChunkPoint.y write FChunkPoint.y;
   public
     function LoadFromMCA(chunk_index:word;mca:TMCA_Stream):boolean;
+    function LoadFromDAT(filename:string):boolean;experimental;//可能不能简单的load，之后decode会出错
     procedure Decode(tree:TATree);
     procedure SaveToFile;
   public
@@ -232,6 +233,11 @@ begin
   result:=true;
 end;
 
+function TChunk_Stream.LoadFromDAT(filename:string):boolean;
+begin
+  FStream.LoadFromFile(filename);
+  result:=true;
+end;
 
 procedure TChunk_Stream.Decode(tree:TATree);
 var

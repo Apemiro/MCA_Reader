@@ -1,0 +1,22 @@
+//计划用于测试dat文件的分析，但是目前为止还没有正确测试通过
+define mca_test "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202507021142 - forEditing\data\map_14.dat"
+define oup_json "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202507021142 - forEditing\MCA_Reader\dat"
+
+var object chk
+var object tree
+
+chunk.new     @chk
+tree.new      @tree
+
+chunk.loadfromdat    @chk,   @mca_test
+chunk.decode  @chk,   @tree
+tree.to_json  @tree,  @oup_json, "analysis"
+
+chunk.free    @chk
+tree.free     @tree
+
+
+unvar chk
+unvar tree
+
+

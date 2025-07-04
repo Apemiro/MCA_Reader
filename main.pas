@@ -343,6 +343,19 @@ begin
     end;
   (chk_obj as TChunk_Stream).LoadFromMCA(chunk_number,mca_obj as TMCA_Stream);
 end;
+procedure Func_loadChunkFromDat(Sender:TObject);
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    chk:TObject;
+    fname:string;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToObject(1,TChunk_Stream,chk) then exit;
+  if not AAuf.TryArgToString(2,fname) then exit;
+  (chk as TChunk_Stream).LoadFromDAT(fname);
+end;
 procedure Func_decodeChunk(Sender:TObject);//xxx $8[],$8[]
 var AufScpt:TAufScript;
     AAuf:TAuf;
@@ -969,10 +982,10 @@ end;
 procedure Func_MCA_GeoFormatting(Sender:TObject);//geof mca_file_name dir
 var AufScpt:TAufScript;
     AAuf:TAuf;
-    filename,dir:string;
-    chunkN,po:integer;
+    filename,dir,mode:string;
+    chunkN,po,altitude:integer;
     tmp_tile:TMCA_Tile;
-    block_tile_list,height_tile_list:TMCA_Tile_List;
+    block_tile_list:TMCA_Tile_List;
     ents:TEntities;
     mca:TMCA_Stream;
     chunk:TChunk_Stream;
@@ -985,6 +998,13 @@ begin
   if not AAuf.CheckArgs(3) then exit;
   if not AAuf.TryArgToString(1, filename) then exit;
   if not AAuf.TryArgToString(2, dir) then exit;
+  if AAuf.ArgsCount>3 then begin
+    if not AAuf.TryArgToStrParam(3,['top','surface','clip','above','below','density','height','realheight','biomes'],false,mode) then exit;
+    if AAuf.ArgsCount>4 then begin
+      if not AAuf.TryArgToLong(4,altitude) then exit;
+      //更多参数
+    end else altitude:=65;
+  end else mode:='below';
 
   if filename='' then begin
     AufScpt.send_error('警告：文件名不能为空，代码未执行。');exit
@@ -995,9 +1015,8 @@ begin
   tree:=TATree.Create;
   blocks:=TChunk_Block.Create;
   sel:=TSelectionRule.Create;
-  sel.AddBlock(473);
+  //sel.AddBlock(473);//这是MC1.6.4 ICBCRCGTFR-nofr-NAM整合包中的剩余热量方块
   block_tile_list:=TMCA_Tile_List.Create;
-  height_tile_list:=TMCA_Tile_List.Create;
   ents:=TEntities.Create;
 
 
@@ -1011,28 +1030,29 @@ begin
         tree.Clear;
         chunk.Decode(tree);
         blocks.LoadFromTree(tree);
+        block_tile_list.GetChunkPlan(blocks,mode,altitude,Byte(smExclude),sel);
         //block_tile_list.GetChunkPlan(blocks,'above',65,Byte(smExclude),sel);
         //block_tile_list.GetChunkPlan(blocks,'clip',-59,Byte(smExclude),sel);
-        block_tile_list.GetChunkPlan(blocks,'biomes',54,Byte(smExclude),sel);
+        //block_tile_list.GetChunkPlan(blocks,'biomes',54,Byte(smExclude),sel);
         //height_tile_list.GetChunkPlan(blocks,'realheight',0,Byte(smExclude),sel);
         ents.LoadFromTree(tree);
       except
         AufScpt.writeln('警告：mca['+IntToStr(mca.x)+','+IntToStr(mca.z)+'].chunk['+IntToStr(chunkN)+']读取失败。');
-        tree.JsonFileMode:=jfmAnalysis;
-        tree.PrintJSON('error_tree.json');
-        tree.JsonFileMode:=jfmStored;
+        //tree.JsonFileMode:=jfmAnalysis;
+        //tree.PrintJSON('error_tree.json');
+        //tree.JsonFileMode:=jfmStored;
+        //break;
       end;
     end;
   //AufScpt.writeln(Format('number of entities: %d',[ents.Count]));
 
   filename:=ExtractFileName(filename);
   if pos('.mca',filename)=length(filename)-3 then delete(filename,length(filename)-3,4);
-  block_tile_list.SaveAsTiff(dir+'\'+filename+'_block');
+  block_tile_list.SaveAsTiff(dir+'\'+filename+Format('_%s[%d]',[mode,altitude]));
   //height_tile_list.SaveAsTiff(dir+'\'+filename+'_height');
   //ents.SaveAsShp(dir+'\'+filename+'_entities');
 
   ents.Free;
-  height_tile_list.Free;
   block_tile_list.Free;
   sel.Free;
   blocks.Free;
@@ -1062,6 +1082,7 @@ begin
     add_func('chunk.new',@Func_newChunk,'arv','创建一个chunk内存，并将指针保存在arv',TChunk_Stream);
     add_func('chunk.free',@Func_freeChunk,'arv','释放arv指向的chunk内存');
     add_func('chunk.load',@Func_loadChunk,'arv,mca,chunkNo','从mca内存中提取第chunkNo个区块');
+    add_func('chunk.loadfromdat',@Func_loadChunkFromDat,'arv,dat_file','从dat文件中提取NBT格式');
     add_func('chunk.decode',@Func_decodeChunk,'arv,tree','将arv指向的chunk内存中的NBT数据解析到tree中');
 
     add_func('tree.new',@Func_newTree,'arv','创建一个tree结构，并将指针保存在arv',TATree);
