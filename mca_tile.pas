@@ -38,7 +38,7 @@ type
     procedure GetBelow(chunkblock:TMemoryStream;y:byte);//从chunkblock提取方块平面图，使用前要使用SetOffset
     procedure GetAbove(chunkblock:TMemoryStream;y:byte);//从chunkblock提取方块平面图，使用前要使用SetOffset
     }
-    procedure GetBiomesClip(block:TChunk_Block;y:byte);
+    procedure GetBiomesClip(block:TChunk_Block;y:integer);
     procedure GetClip(block:TChunk_Block;y:integer);
     procedure GetSurface(block:TChunk_Block;mode:string='ws');
     procedure GetHeight(block:TChunk_Block;mode:string='ws');//通过高度图获得
@@ -186,20 +186,27 @@ begin
     end;
 end;
 }
-procedure TMCA_Tile.GetBiomesClip(block:TChunk_Block;y:byte);
+procedure TMCA_Tile.GetBiomesClip(block:TChunk_Block;y:integer);
 var x,z:byte;
     adapter:dword;
+    pStream:TMemoryStream;
 begin
-  block.Biomes.position:=y*256*4;
-  z:=0;x:=0;
-  while z<16 do
-    begin
-      adapter:=block.Biomes.ReadDWord;
-      pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
-      inc(x);
-      if x=16 then
-        begin
-          x:=0;inc(z);
+    if y>=0 then begin
+        pStream:=block.Biomes;
+        pStream.Position:=y*256*4;
+    end else begin
+        pStream:=block.BiomesBelow;
+        pStream.Position:=-((y+1) div 16) shl 14 + (y+1) mod 16 shl 10;
+    end;
+    z:=0;
+    x:=0;
+    while z<16 do begin
+        adapter:=pStream.ReadDWord;
+        pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter;
+        inc(x);
+        if x=16 then begin
+            x:=0;
+            inc(z);
         end;
     end;
 end;

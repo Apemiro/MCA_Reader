@@ -51,6 +51,7 @@ type
     FStream:TMemoryStream;
     FSBelow:TMemoryStream;//0坐标以下的方块
     FBiomes:TMemoryStream;
+    FBiomes_below:TMemoryStream;//0高度以下的群系
     FMB,FMBN,FOF,FOFW,FWS,FWSW:array[0..256]of word;//高度图，其中第256位为0表示高度图无效
     xPos,zPos:longint;
   protected
@@ -72,6 +73,7 @@ type
     property Stream:TMemoryStream read FStream write FStream;
     property SBelow:TMemoryStream read FSBelow write FSBelow;
     property Biomes:TMemoryStream read FBiomes write FBiomes;
+    property BiomesBelow:TMemoryStream read FBiomes_below write FBiomes_below;
     property motion_blocking[block_index:byte]:word read GetHeightMap_MB write SetHeightMap_MB;
     property motion_blocking_on_leaves[block_index:byte]:word read GetHeightMap_MBN write SetHeightMap_MBN;
     property ocean_floor[block_index:byte]:word read GetHeightMap_OF write SetHeightMap_OF;
@@ -103,7 +105,8 @@ type
 
   protected//这一部分不同版本做法不同，但全部用LoadFromTree来调用，外部不可用
     procedure ExtractChunkPos(tree:TATree);inline;//仅接受唯一（第1个）chunk
-    function ExtractBiomes(tree:TATree):boolean;//仅接受唯一（第1个）chunk
+    function ExtractBiomes_164(tree:TATree):boolean;//仅接受唯一（第1个）chunk
+    function ExtractBiomes_1_18(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractBlocks_164(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractBlocks_1_13(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractBlocks_1_18(tree:TATree):boolean;//仅接受唯一（第1个）chunk
@@ -737,7 +740,7 @@ begin
   defaultBlocks.AddBlockId('minecraft:air');//强制设置0为空气方块
 
   tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
-  tree.CurrentInto('Level'); //21w39a之后Level取消，可进可不进
+  tree.CurrentInto('Level'); //21w43a之后Level取消，可进可不进
   if not tree.CurrentInto('sections') then raise Exception.Create('sections');
   tmp:=tree.Current.AChild.first;
   while tmp<>nil do
@@ -838,7 +841,7 @@ begin
   result:=true;
 end;
 
-function TChunk_Block.ExtractBiomes(tree:TATree):boolean;
+function TChunk_Block.ExtractBiomes_164(tree:TATree):boolean;
 var pi:word;
     btmp,floor:byte;
 begin
@@ -865,6 +868,105 @@ begin
   result:=true;
 end;
 
+function TChunk_Block.ExtractBiomes_1_18(tree:TATree):boolean;
+var idx:word;
+    tmp,palette_unit:TAListUnit;
+    SectionsId:integer;
+    biome_name:string;
+    biome_defs:array[0..63]of integer;
+    btimes,bsh:byte;
+    band,buffer,bindex:int64;
+    pStream:TMemoryStream;
+
+    function ceil(inp:double):int64;
+    begin
+      if inp=trunc(inp) then result:=trunc(inp)
+      else result:=trunc(inp)+1;
+    end;
+
+begin
+    result:=false;
+    tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
+    tree.CurrentInto('Level'); //21w43a
+
+
+    Self.FBiomes.Position:=0;
+    Self.FBiomes.SetSize(16*16*384*4);
+    Self.FBiomes_below.Position:=0;
+    Self.FBiomes_below.SetSize(16*16*64*4);
+
+    if not tree.CurrentInto('sections') then raise Exception.Create('sections');
+    tmp:=tree.Current.AChild.first;
+    while tmp<>nil do begin
+        tree.CurrentInto(tmp.obj as TATreeUnit);
+        tree.CurrentInto('Y');
+        SectionsId:=tree.Current.AByte;
+        tree.CurrentOut;
+
+        if not tree.CurrentInto('biomes') then raise Exception.Create('biomes');
+        if tree.CurrentInto('palette') then begin
+            palette_unit:=tree.Current.Achild.first;
+            idx:=0;
+            while palette_unit<>nil do begin
+                biome_name:=TATreeUnit(palette_unit.obj).AString;
+                biome_defs[idx]:=defaultBiomes.AddBlockId(biome_name);
+                inc(idx);
+                palette_unit:=palette_unit.next;
+            end;
+        end else begin
+            //没有方块索引的子区块直接退出，相当于全部是minecraft:the_void
+            biome_defs[0]:=defaultBiomes.AddBlockId('minecraft:the_void');
+            if SectionsId>=0 then begin
+                FBiomes.position:=SectionsId*4096*4+0;
+                for idx:=0 to 4095 do FBiomes.WriteDWord(biome_defs[0]);
+            end else begin
+                FBiomes_below.position:=(-SectionsId-1)*4096*4+0;
+                for idx:=0 to 4095 do FBiomes_below.WriteDWord(biome_defs[0]);
+            end;
+            tmp:=tmp.next;
+            continue;
+        end;
+
+        tree.CurrentOut;//Palette
+        tree.CurrentOut;//Sections
+
+        if not tree.CurrentInto('data') then begin
+            if SectionsId>=0 then begin
+                FBiomes.position:=SectionsId*4096*4+0;
+                for idx:=0 to 4095 do FBiomes.WriteDWord(biome_defs[0]);
+            end else begin
+                FBiomes_below.position:=(-SectionsId-1)*4096*4+0;
+                for idx:=0 to 4095 do FBiomes_below.WriteDWord(biome_defs[0]);
+            end;
+            tmp:=tmp.next;
+            continue; // 无data就用Palette[0]填充整个子区块
+        end;
+
+        band:=$000000000000003F;
+        btimes:=9;
+        bsh:=6;
+
+        if tree.Current.size = ceil(4096/(btimes+1)) then begin //1.16
+            if SectionsId>=0 then begin
+                pStream:=FBiomes;
+                pStream.position:=SectionsId*4096*4+0;
+            end else begin
+                pStream:=FBiomes_below;
+                pStream.position:=(-SectionsId-1)*4096*4+0;
+            end;
+            for idx:=0 to tree.Current.size do begin
+                buffer:=tree.Current.ALongArray[idx];
+                buffer:=SwapEndian(buffer);
+                for bindex:=0 to btimes do begin
+                    pStream.WriteDWord(biome_defs[buffer and band]);
+                    buffer:=buffer shr bsh;
+                end;
+            end;
+        end else begin assert(false,'Biomes位数不正确');exit end;
+        tmp:=tmp.next;
+    end;
+    result:=true;
+end;
 
 function TChunk_Block.ExtractHeightMap_164(tree:TATree):boolean;
 var pi:word;
@@ -996,7 +1098,16 @@ begin
   result:=false;
   if not OnlyOneChunk(tree) then exit;
   ExtractChunkPos(tree);
-  ExtractBiomes(tree);
+
+  if HasPalette(tree) then begin //Sections[*]中有Palette
+    //if not ExtractBiomes_1_13(tree) then exit;
+    exit;
+  end else if HasBlockStates(tree) then begin
+    if not ExtractBiomes_1_18(tree) then exit;
+  end else begin
+    if not ExtractBiomes_164(tree) then exit;
+  end;
+
 
   if HasHeightMaps(tree) then begin
     if not ExtractHeightMap_1_13(tree) then exit;
@@ -1104,6 +1215,7 @@ begin
   FStream:=TMemoryStream.Create;
   FSBelow:=TMemoryStream.Create;
   FBiomes:=TMemoryStream.Create;
+  FBiomes_below:=TMemoryStream.Create;
   FMB[256]:=0;
   FMBN[256]:=0;
   FOF[256]:=0;
@@ -1117,6 +1229,7 @@ begin
   FStream.Free;
   FSBelow.Free;
   FBiomes.Free;
+  FBiomes_below.Free;
   inherited Destroy;
 end;
 

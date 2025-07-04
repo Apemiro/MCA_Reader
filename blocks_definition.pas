@@ -22,6 +22,8 @@ type
     destructor Destroy;override;
   end;//储存名称与ID关系
 
+  TBiomeList=TBlockList;
+
   TBlockUnit=class
     name:string;
     id:word;
@@ -48,6 +50,7 @@ type
   end;//方块索引列表
 
 var defaultBlocks:TBlockList;
+    defaultBiomes:TBiomeList;
 
 
 implementation
@@ -177,6 +180,7 @@ end;
 initialization
 
   defaultBlocks:=TBlockList.Create;
+  defaultBiomes:=TBiomeList.Create;
   {
   try
     defaultBlocks.LoadFromFile('defaultBlocks.txt');
@@ -201,5 +205,6 @@ initialization
 finalization
   //defaultBlocks.SaveToFile('defaultBlocks.txt');
   defaultBlocks.Free;
+  defaultBiomes.Free;
 end.
 

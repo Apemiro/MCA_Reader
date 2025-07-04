@@ -193,13 +193,21 @@ begin
   FormViewer.Show;
 end;
 
-procedure Func_viewPalette(Sender:TObject);
+procedure Func_viewBlockPalette(Sender:TObject);
 var AufScpt:TAufScript;
     AAuf:TAuf;
 begin
   AufScpt:=Sender as TAufScript;
   AAuf:=AufScpt.Auf as TAuf;
   AufScpt.writeln(defaultBlocks.ExportToString(#13#10));
+end;
+procedure Func_viewBiomePalette(Sender:TObject);
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  AufScpt.writeln(defaultBiomes.ExportToString(#13#10));
 end;
 
 
@@ -1003,9 +1011,9 @@ begin
         tree.Clear;
         chunk.Decode(tree);
         blocks.LoadFromTree(tree);
-        block_tile_list.GetChunkPlan(blocks,'above',65,Byte(smExclude),sel);
+        //block_tile_list.GetChunkPlan(blocks,'above',65,Byte(smExclude),sel);
         //block_tile_list.GetChunkPlan(blocks,'clip',-59,Byte(smExclude),sel);
-        //block_tile_list.GetChunkPlan(blocks,'biomes',54,Byte(smExclude),sel);
+        block_tile_list.GetChunkPlan(blocks,'biomes',54,Byte(smExclude),sel);
         //height_tile_list.GetChunkPlan(blocks,'realheight',0,Byte(smExclude),sel);
         ents.LoadFromTree(tree);
       except
@@ -1039,11 +1047,12 @@ procedure TFormMain.AufInit(scpt:TAufScript);
 begin
 
   WITH scpt DO BEGIN
-    InternalFuncDefine;
+    //InternalFuncDefine;
     add_func('about',@Func_about,'','当前MCA Reader的版本信息');
     add_func('mapviewer',@Func_MapViewer,'','打开MapViewer');
 
-    add_func('palette.view',@Func_viewPalette,'','显示色板');
+    add_func('palette.view.block',@Func_viewBlockPalette,'','显示方块色板');
+    add_func('palette.view.biome',@Func_viewBiomePalette,'','显示群系色板');
 
     add_func('mca.new',@Func_newMCA,'arv','创建一个mca内存，并将指针保存在arv',TMCA_Stream);
     add_func('mca.free',@Func_freeMCA,'arv','释放arv指向的mca内存');

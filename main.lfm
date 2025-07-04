@@ -4,11 +4,10 @@ object FormMain: TFormMain
   Top = 327
   Width = 772
   Caption = 'MCA Reader'
-  ClientHeight = 523
+  ClientHeight = 533
   ClientWidth = 772
   Constraints.MinHeight = 320
   Constraints.MinWidth = 480
-  DesignTimePPI = 144
   Menu = MainMenu1
   OnCreate = FormCreate
   OnResize = FormResize
@@ -20,7 +19,7 @@ object FormMain: TFormMain
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = StatusBar1
     Left = 5
-    Height = 479
+    Height = 501
     Top = 5
     Width = 762
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -28,28 +27,31 @@ object FormMain: TFormMain
     BorderSpacing.Top = 5
     BorderSpacing.Right = 5
     BorderSpacing.Bottom = 5
-    ClientHeight = 479
+    ClientHeight = 501
     ClientWidth = 762
     inherited ProgressBar: TProgressBar
       AnchorSideRight.Control = Frame_AufScript1
       AnchorSideBottom.Control = Frame_AufScript1
       Left = 441
       Height = 24
-      Top = 447
+      Top = 469
       Width = 309
     end
     inherited Memo_out: TMemo
       AnchorSideTop.Control = Frame_AufScript1
       AnchorSideRight.Control = Frame_AufScript1
-      Height = 439
+      Height = 461
       Width = 598
     end
     inherited Memo_cmd: TSynEdit
       AnchorSideLeft.Control = Frame_AufScript1
       AnchorSideTop.Control = Frame_AufScript1
-      Height = 439
+      Height = 461
       Gutter.Width = 59
       inherited SynLeftGutterPartList1: TSynGutterPartList
+        inherited SynGutterLineNumber1: TSynGutterLineNumber
+          Width = 17
+        end
         inherited SynGutterCodeFolding1: TSynGutterCodeFolding
           AutoSize = False
           Width = 12
@@ -58,7 +60,7 @@ object FormMain: TFormMain
     end
     inherited Splitter_Vert: TSplitter
       AnchorSideTop.Control = Frame_AufScript1
-      Height = 439
+      Height = 461
     end
     inherited Splitter_Horiz: TSplitter
       AnchorSideLeft.Control = Frame_AufScript1
@@ -68,42 +70,42 @@ object FormMain: TFormMain
     inherited Button_ScriptLoad: TBitBtn
       AnchorSideBottom.Control = Frame_AufScript1
       Height = 40
-      Top = 439
+      Top = 461
       Width = 85
     end
     inherited Button_ScriptSave: TBitBtn
       AnchorSideBottom.Control = Frame_AufScript1
       Left = 85
       Height = 40
-      Top = 439
+      Top = 461
       Width = 85
     end
     inherited Button_run: TBitBtn
       AnchorSideBottom.Control = Frame_AufScript1
       Left = 174
       Height = 40
-      Top = 439
+      Top = 461
       Width = 85
     end
     inherited Button_pause: TBitBtn
       AnchorSideBottom.Control = Frame_AufScript1
       Left = 259
       Height = 40
-      Top = 439
+      Top = 461
       Width = 85
     end
     inherited Button_stop: TBitBtn
       AnchorSideBottom.Control = Frame_AufScript1
       Left = 344
       Height = 40
-      Top = 439
+      Top = 461
       Width = 85
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 34
-    Top = 489
+    Height = 22
+    Top = 511
     Width = 772
     Panels = <>
   end

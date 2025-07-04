@@ -1,0 +1,46 @@
+
+define mca_test "F:\Apiglio\LazarusProject\MCA_Reader\MCA\热带海湾 - 202507031204\poi\r.-2.0.mca"
+define oup_json "F:\Apiglio\LazarusProject\MCA_Reader\MCA\热带海湾 - 202507031204\MCA_Reader\poi"
+
+var string fn 1024
+var int cid
+var object mca
+var object chk
+var object tree
+
+mov @cid, 0
+loo:
+
+mca.new       @mca
+chunk.new     @chk
+tree.new      @tree
+
+
+mca.load      @mca,   @mca_test
+mca.no_chunk? @mca,   @cid,      :continue
+chunk.load    @chk,   @mca,      @cid
+chunk.decode  @chk,   @tree
+tree.to_json  @tree,  @oup_json, "analysis"
+
+
+println "已导出（如果没有输出则表示没有该区块）"
+jmp :finally
+
+continue:
+add @cid,1
+jmp :loo
+
+finally:
+
+mca.free      @mca
+chunk.free    @chk
+tree.free     @tree
+
+
+unvar mca
+unvar chk
+unvar tree
+unvar fn
+unvar cid
+
+palette.view
