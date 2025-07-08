@@ -80,24 +80,22 @@ end;
 function TBlockList.FindBlockId(block_name:string):Integer;
 var pi:integer;
 begin
-  pi:=0;
-  while pi<Self.FBlockList.Count do
-    begin
-      if Self.FBlockList[pi]=block_name then
-        begin
-          result:=pi;
-          exit;
+    pi:=0;
+    while pi<Self.FBlockList.Count do begin
+        if Self.FBlockList[pi]=block_name then begin
+            result:=pi;
+            exit;
         end;
-      inc(pi);
+        inc(pi);
     end;
-  result:=Self.FBlockList.Count;//找不到则返回超界下标
+    result:=-1;
 end;
 
 function TBlockList.AddBlockId(block_name:string):Integer;
 var pi:integer;
 begin
   result:=FindBlockId(block_name);
-  if result<Self.FBlockList.Count then exit;
+  if result>=0 then exit;
   Self.FBlockList.AddText(block_name);
 end;
 

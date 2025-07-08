@@ -983,7 +983,7 @@ procedure Func_MCA_GeoFormatting(Sender:TObject);//geof mca_file_name dir
 var AufScpt:TAufScript;
     AAuf:TAuf;
     filename,dir,mode:string;
-    chunkN,po,altitude:integer;
+    chunkN,po,altitude,bindex:integer;
     tmp_tile:TMCA_Tile;
     block_tile_list:TMCA_Tile_List;
     ents:TEntities;
@@ -992,6 +992,7 @@ var AufScpt:TAufScript;
     tree:TATree;
     blocks:TChunk_Block;
     sel:TSelectionRule;
+    tmpBool:boolean;
 begin
   AufScpt:=Sender as TAufScript;
   AAuf:=AufScpt.Auf as TAuf;
@@ -1000,11 +1001,10 @@ begin
   if not AAuf.TryArgToString(2, dir) then exit;
   if AAuf.ArgsCount>3 then begin
     if not AAuf.TryArgToStrParam(3,['top','surface','clip','above','below','density','height','realheight','biomes'],false,mode) then exit;
-    if AAuf.ArgsCount>4 then begin
-      if not AAuf.TryArgToLong(4,altitude) then exit;
-      //更多参数
-    end else altitude:=65;
   end else mode:='below';
+  if AAuf.ArgsCount>4 then begin
+    if not AAuf.TryArgToLong(4,altitude) then exit;
+  end else altitude:=65;
 
   if filename='' then begin
     AufScpt.send_error('警告：文件名不能为空，代码未执行。');exit
@@ -1014,12 +1014,14 @@ begin
   chunk:=TChunk_Stream.Create;
   tree:=TATree.Create;
   blocks:=TChunk_Block.Create;
+
   sel:=TSelectionRule.Create;
   //sel.AddBlock(473);//这是MC1.6.4 ICBCRCGTFR-nofr-NAM整合包中的剩余热量方块
+
   block_tile_list:=TMCA_Tile_List.Create;
   ents:=TEntities.Create;
 
-
+  tmpBool:=false;
   mca.LoadFromFile(filename);
   for chunkN:=0 to 1023 do
     begin
@@ -1030,7 +1032,18 @@ begin
         tree.Clear;
         chunk.Decode(tree);
         blocks.LoadFromTree(tree);
-        block_tile_list.GetChunkPlan(blocks,mode,altitude,Byte(smExclude),sel);
+
+        //重复往sel中增加，暂时的作法，之后重写selectition
+        //bindex:=defaultBlocks.FindBlockId('minecraft:pointed_dripstone');
+        //if bindex>=0 then sel.AddBlock(bindex);
+        //if defaultBlocks.FindBlockId('minecraft:pointed_dripstone')>0 then begin
+        //  if not tmpBool then AufScpt.writeln(Format('file: %s, chunk: %d',[filename,chunkN]));
+        //  tmpBool:=true;
+        //end;
+
+        //block_tile_list.GetChunkPlan(blocks,mode,altitude,Byte(smExclude),sel);
+        //block_tile_list.GetChunkPlan(blocks,mode,altitude,Byte(smJust),sel);
+
         //block_tile_list.GetChunkPlan(blocks,'above',65,Byte(smExclude),sel);
         //block_tile_list.GetChunkPlan(blocks,'clip',-59,Byte(smExclude),sel);
         //block_tile_list.GetChunkPlan(blocks,'biomes',54,Byte(smExclude),sel);
@@ -1048,9 +1061,9 @@ begin
 
   filename:=ExtractFileName(filename);
   if pos('.mca',filename)=length(filename)-3 then delete(filename,length(filename)-3,4);
-  block_tile_list.SaveAsTiff(dir+'\'+filename+Format('_%s[%d]',[mode,altitude]));
+  //block_tile_list.SaveAsTiff(dir+'\'+filename+Format('_%s[%d]',[mode,altitude]));
   //height_tile_list.SaveAsTiff(dir+'\'+filename+'_height');
-  //ents.SaveAsShp(dir+'\'+filename+'_entities');
+  ents.SaveAsShp(dir+'\'+filename+'_entities');
 
   ents.Free;
   block_tile_list.Free;

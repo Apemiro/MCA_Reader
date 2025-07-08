@@ -30,6 +30,8 @@ type
   protected
     function OnlyOneChunk(tree:TATree):boolean;inline;
     function ExtractEntities_164(tree:TATree):boolean;
+    function ExtractBlockEntities_164(tree:TATree):boolean;
+
   public
     function LoadFromTree(tree:TATree):boolean;
   public
@@ -85,6 +87,7 @@ begin
   tmpSHP:=TShapeFile.Create(shpPoint);
   tmpSHP.AddField('ent_name',gptChar);//1
   tmpSHP.AddField('rotation',gptFloat);//2
+  tmpSHP.AddField('elevation',gptFixNum);//3
   for fid:=0 to Self.Count-1 do
     begin
       fea:=TAGeoPoint.Create;
@@ -94,6 +97,7 @@ begin
       fea.Point.z:=TEntityUnit(Self.Items[fid]).pos.y;
       fea.Char[1]:=TEntityUnit(Self.Items[fid]).id;
       fea.Float[2]:=TEntityUnit(Self.Items[fid]).rotation.h;
+      fea.FixNum[3]:=trunc(TEntityUnit(Self.Items[fid]).pos.z);
 
       {
       fea.Point.x:=0;
@@ -172,6 +176,57 @@ begin
 
 end;
 
+function TEntities.ExtractBlockEntities_164(tree:TATree):boolean;
+var tmp:TAListUnit;
+    node:TATreeUnit;
+    px,py,pz:Integer;
+    ent_id:string;
+begin
+    result:=false;
+    tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
+    if tree.CurrentInto('Level') then begin
+        if not tree.CurrentInto('TileEntities') then raise Exception.Create('no Level.TileEntities');
+    end else begin
+        //21w39a展开了Level层
+        if not tree.CurrentInto('block_entities') then raise Exception.Create('no block_entities');
+    end;
+    tmp:=tree.Current.AChild.first;
+    while tmp<>nil do begin
+        tree.CurrentInto(tmp.obj as TATreeUnit);
+
+        tree.CurrentInto('id');
+        ent_id:=tree.Current.AString;
+        tree.CurrentOut;
+
+        tree.CurrentInto('x');
+        px:=tree.Current.AInt;
+        tree.CurrentOut;
+
+        tree.CurrentInto('y');
+        py:=tree.Current.AInt;
+        tree.CurrentOut;
+
+        tree.CurrentInto('z');
+        pz:=tree.Current.AInt;
+        tree.CurrentOut;
+
+        tree.CurrentOut;
+
+        with AddEntity(ent_id) do begin
+            rotation.h:=0;
+            rotation.v:=0;
+            pos.x:=px;
+            pos.y:=py;
+            pos.z:=pz;
+            motion.x:=0;
+            motion.y:=0;
+            motion.z:=0;
+        end;
+
+        tmp:=tmp.next;
+    end;
+end;
+
 function TEntities.OnlyOneChunk(tree:TATree):boolean;inline;
 begin
   if tree.root.Achild.count<>1 then result:=false else result:=true;
@@ -180,8 +235,8 @@ function TEntities.LoadFromTree(tree:TATree):boolean;
 begin
   result:=false;
   if not OnlyOneChunk(tree) then exit;
-  if not ExtractEntities_164(tree) then exit;
-
+  ExtractEntities_164(tree);
+  ExtractBlockEntities_164(tree);
   result:=true;
 end;
 
