@@ -107,6 +107,7 @@
       <Unit15>
         <Filename Value="..\FileAccess-SHP\apiglio_geo.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Apiglio_Geo"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\FileAccess-SHP\apiglio_shapefile.pas"/>

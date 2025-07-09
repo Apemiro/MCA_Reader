@@ -4,12 +4,12 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="54">
+    <Units Count="48">
       <Unit0>
         <Filename Value="MCA_Reader.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="11"/>
-        <CursorPos X="30" Y="21"/>
+        <EditorIndex Value="13"/>
+        <CursorPos X="18" Y="4"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1037"/>
-        <CursorPos X="31" Y="1064"/>
+        <TopLine Value="1044"/>
+        <CursorPos X="61" Y="1066"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -42,18 +42,18 @@
         <Filename Value="entities_definition.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="10"/>
-        <TopLine Value="121"/>
-        <CursorPos X="47" Y="140"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="82"/>
+        <CursorPos X="57" Y="113"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="mca_tile.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="50"/>
-        <CursorPos X="15" Y="68"/>
+        <CursorPos X="28" Y="71"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -70,8 +70,8 @@
         <Filename Value="mca_base.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="1102"/>
-        <CursorPos X="3" Y="1104"/>
+        <TopLine Value="323"/>
+        <CursorPos X="44" Y="342"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit6>
@@ -87,7 +87,7 @@
       <Unit8>
         <Filename Value="blocks_definition.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="80"/>
         <CursorPos Y="98"/>
         <UsageCount Value="200"/>
@@ -103,16 +103,16 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="150"/>
       </Unit9>
       <Unit10>
         <Filename Value="..\AufScript\apiglio_useful.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Apiglio_Useful"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="5223"/>
         <CursorPos Y="5240"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="150"/>
         <Loaded Value="True"/>
       </Unit10>
       <Unit11>
@@ -121,7 +121,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1860"/>
         <CursorPos Y="1893"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="150"/>
       </Unit11>
       <Unit12>
         <Filename Value="..\AufScript\auftype\auf_type_array.pas"/>
@@ -129,7 +129,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="20"/>
         <CursorPos Y="52"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="150"/>
       </Unit12>
       <Unit13>
         <Filename Value="..\AufScript\auftype\auf_type_base.pas"/>
@@ -137,7 +137,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="25"/>
         <CursorPos X="19" Y="25"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="150"/>
         <Loaded Value="True"/>
       </Unit13>
       <Unit14>
@@ -145,25 +145,26 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="12"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="150"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\FileAccess-SHP\apiglio_geo.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="135"/>
+        <UnitName Value="Apiglio_Geo"/>
+        <EditorIndex Value="12"/>
+        <TopLine Value="110"/>
+        <CursorPos X="28" Y="125"/>
+        <UsageCount Value="150"/>
+        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\FileAccess-SHP\apiglio_shapefile.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Apiglio_ShapeFile"/>
-        <EditorIndex Value="12"/>
-        <TopLine Value="300"/>
-        <CursorPos X="25" Y="317"/>
-        <UsageCount Value="135"/>
+        <EditorIndex Value="14"/>
+        <TopLine Value="214"/>
+        <CursorPos X="28" Y="269"/>
+        <UsageCount Value="150"/>
         <Loaded Value="True"/>
       </Unit16>
       <Unit17>
@@ -171,9 +172,9 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Apiglio_Tree"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="334"/>
-        <CursorPos Y="352"/>
-        <UsageCount Value="123"/>
+        <TopLine Value="827"/>
+        <CursorPos Y="845"/>
+        <UsageCount Value="138"/>
         <Loaded Value="True"/>
       </Unit17>
       <Unit18>
@@ -182,7 +183,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4091"/>
         <CursorPos X="60" Y="4099"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="188"/>
       </Unit18>
       <Unit19>
         <Filename Value="K:\FPC_Unit\Auf\aufscript_command.pas"/>
@@ -190,7 +191,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="188"/>
       </Unit19>
       <Unit20>
         <Filename Value="K:\FPC_Unit\Tree\apiglio_tree.pas"/>
@@ -198,7 +199,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="769"/>
         <CursorPos X="31" Y="789"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="188"/>
       </Unit20>
       <Unit21>
         <Filename Value="K:\FPC_Unit\FileAccess\SHP\apiglio_geo.pas"/>
@@ -206,7 +207,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="106"/>
         <CursorPos X="49" Y="142"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="188"/>
       </Unit21>
       <Unit22>
         <Filename Value="K:\FPC_Unit\FileAccess\SHP\apiglio_shapefile.pas"/>
@@ -214,7 +215,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="249"/>
         <CursorPos X="34" Y="265"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="188"/>
       </Unit22>
       <Unit23>
         <Filename Value="form_colorsetting.pas"/>
@@ -225,100 +226,93 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="3"/>
         <CursorPos X="72" Y="11"/>
-        <UsageCount Value="178"/>
+        <UsageCount Value="176"/>
       </Unit23>
       <Unit24>
         <Filename Value="K:\lazarus\fpc\3.0.0\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="866"/>
         <CursorPos X="3" Y="840"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="26"/>
       </Unit24>
       <Unit25>
         <Filename Value="K:\lazarus\fpc\3.0.0\source\packages\paszlib\src\zstream.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="19"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="11"/>
       </Unit25>
       <Unit26>
-        <Filename Value="K:\lazarus\fpc\3.0.0\source\rtl\inc\objpash.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="217"/>
-        <CursorPos X="29" Y="210"/>
-        <UsageCount Value="1"/>
-      </Unit26>
-      <Unit27>
         <Filename Value="K:\lazarus\fpc\3.0.0\source\packages\paszlib\src\zbase.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="478"/>
         <CursorPos X="44" Y="380"/>
-        <UsageCount Value="10"/>
-      </Unit27>
-      <Unit28>
+        <UsageCount Value="8"/>
+      </Unit26>
+      <Unit27>
         <Filename Value="D:\Lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="326"/>
         <CursorPos X="3" Y="298"/>
-        <UsageCount Value="9"/>
-      </Unit28>
-      <Unit29>
+        <UsageCount Value="7"/>
+      </Unit27>
+      <Unit28>
         <Filename Value="D:\Lazarus\fpc\3.0.4\source\rtl\objpas\sysutils\sysunih.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="31"/>
         <CursorPos X="10" Y="44"/>
-        <UsageCount Value="9"/>
-      </Unit29>
-      <Unit30>
+        <UsageCount Value="7"/>
+      </Unit28>
+      <Unit29>
         <Filename Value="D:\Lazarus\fpc\3.0.4\source\rtl\objpas\sysutils\syswideh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="10"/>
         <CursorPos X="10" Y="35"/>
-        <UsageCount Value="9"/>
-      </Unit30>
-      <Unit31>
+        <UsageCount Value="7"/>
+      </Unit29>
+      <Unit30>
         <Filename Value="D:\Lazarus\components\lazutils\lazutf8classes.pas"/>
         <UnitName Value="LazUTF8Classes"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="137"/>
         <CursorPos Y="151"/>
-        <UsageCount Value="9"/>
-      </Unit31>
-      <Unit32>
+        <UsageCount Value="7"/>
+      </Unit30>
+      <Unit31>
         <Filename Value="D:\Lazarus\lcl\include\canvas.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="101"/>
         <CursorPos X="20" Y="115"/>
-        <UsageCount Value="6"/>
-      </Unit32>
-      <Unit33>
+        <UsageCount Value="4"/>
+      </Unit31>
+      <Unit32>
         <Filename Value="D:\Lazarus\lcl\include\rasterimage.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="241"/>
         <CursorPos Y="255"/>
-        <UsageCount Value="6"/>
-      </Unit33>
-      <Unit34>
+        <UsageCount Value="4"/>
+      </Unit32>
+      <Unit33>
         <Filename Value="D:\Lazarus\lcl\include\custombitmap.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="42"/>
         <CursorPos X="3" Y="44"/>
-        <UsageCount Value="6"/>
-      </Unit34>
-      <Unit35>
+        <UsageCount Value="4"/>
+      </Unit33>
+      <Unit34>
         <Filename Value="D:\Lazarus\fpc\3.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="72" Y="25"/>
-        <UsageCount Value="9"/>
-      </Unit35>
-      <Unit36>
+        <UsageCount Value="7"/>
+      </Unit34>
+      <Unit35>
         <Filename Value="D:\Lazarus\fpc\3.0.4\source\rtl\objpas\sysutils\syspchh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="18" Y="20"/>
-        <UsageCount Value="9"/>
-      </Unit36>
-      <Unit37>
+        <UsageCount Value="7"/>
+      </Unit35>
+      <Unit36>
         <Filename Value="K:\FPC_Unit\Auf\aufscript_frame.pas"/>
         <ComponentName Value="Frame_AufScript"/>
         <HasResources Value="True"/>
@@ -326,243 +320,207 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="91"/>
         <CursorPos Y="107"/>
-        <UsageCount Value="35"/>
-      </Unit37>
-      <Unit38>
+        <UsageCount Value="33"/>
+      </Unit36>
+      <Unit37>
         <Filename Value="D:\Lazarus\lcl\include\customform.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="143"/>
         <CursorPos Y="165"/>
-        <UsageCount Value="2"/>
-      </Unit38>
-      <Unit39>
+        <UsageCount Value="0"/>
+      </Unit37>
+      <Unit38>
         <Filename Value="D:\Lazarus\lcl\include\application.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1263"/>
         <CursorPos Y="1277"/>
-        <UsageCount Value="10"/>
-      </Unit39>
-      <Unit40>
+        <UsageCount Value="8"/>
+      </Unit38>
+      <Unit39>
         <Filename Value="D:\Lazarus\lcl\include\control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2231"/>
         <CursorPos X="60" Y="2238"/>
-        <UsageCount Value="4"/>
-      </Unit40>
-      <Unit41>
+        <UsageCount Value="2"/>
+      </Unit39>
+      <Unit40>
         <Filename Value="D:\Lazarus\lcl\include\wincontrol.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="5385"/>
         <CursorPos Y="5398"/>
-        <UsageCount Value="4"/>
-      </Unit41>
-      <Unit42>
+        <UsageCount Value="2"/>
+      </Unit40>
+      <Unit41>
         <Filename Value="D:\Lazarus\lcl\lclmessageglue.pas"/>
         <UnitName Value="LCLMessageGlue"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="100"/>
         <CursorPos Y="122"/>
-        <UsageCount Value="4"/>
-      </Unit42>
-      <Unit43>
+        <UsageCount Value="2"/>
+      </Unit41>
+      <Unit42>
         <Filename Value="D:\Lazarus\lcl\interfaces\win32\win32callback.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2658"/>
         <CursorPos Y="2671"/>
-        <UsageCount Value="4"/>
-      </Unit43>
-      <Unit44>
+        <UsageCount Value="2"/>
+      </Unit42>
+      <Unit43>
         <Filename Value="K:\FPC_Unit\Auf\auf_ram_var.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="6" Y="8"/>
-        <UsageCount Value="4"/>
-      </Unit44>
-      <Unit45>
-        <Filename Value="C:\lazarus\lcl\forms.pp"/>
-        <UnitName Value="Forms"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2221"/>
-        <CursorPos Y="2238"/>
-        <UsageCount Value="1"/>
-      </Unit45>
-      <Unit46>
-        <Filename Value="C:\lazarus\lcl\stdctrls.pp"/>
-        <UnitName Value="StdCtrls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1649"/>
-        <CursorPos Y="1685"/>
-        <UsageCount Value="1"/>
-      </Unit46>
-      <Unit47>
-        <Filename Value="C:\lazarus\components\lazutils\lazfilecache.pas"/>
-        <UnitName Value="LazFileCache"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="517"/>
-        <CursorPos Y="552"/>
-        <UsageCount Value="1"/>
-      </Unit47>
-      <Unit48>
-        <Filename Value="C:\lazarus\lcl\interfaces\win32\win32wsdialogs.pp"/>
-        <UnitName Value="Win32WSDialogs"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1490"/>
-        <CursorPos Y="1522"/>
-        <UsageCount Value="1"/>
-      </Unit48>
-      <Unit49>
-        <Filename Value="C:\lazarus\components\synedit\synhighlighterpas.pp"/>
-        <UnitName Value="SynHighlighterPas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="4501"/>
-        <CursorPos X="43" Y="4534"/>
-        <UsageCount Value="1"/>
-      </Unit49>
-      <Unit50>
-        <Filename Value="C:\lazarus\lcl\controls.pp"/>
-        <UnitName Value="Controls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="4502"/>
-        <UsageCount Value="1"/>
-      </Unit50>
-      <Unit51>
-        <Filename Value="C:\lazarus\components\lazutils\lazutf8classes.pas"/>
-        <UnitName Value="LazUTF8Classes"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="133"/>
-        <CursorPos X="57" Y="158"/>
-        <UsageCount Value="1"/>
-      </Unit51>
-      <Unit52>
+        <UsageCount Value="2"/>
+      </Unit43>
+      <Unit44>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\inc\objpash.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="176"/>
         <CursorPos X="23" Y="194"/>
-        <UsageCount Value="7"/>
-      </Unit52>
-      <Unit53>
+        <UsageCount Value="5"/>
+      </Unit44>
+      <Unit45>
         <Filename Value="versions_settings.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="15" Y="20"/>
-        <UsageCount Value="14"/>
-      </Unit53>
+        <UsageCount Value="12"/>
+      </Unit45>
+      <Unit46>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\base.inc"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="209"/>
+        <CursorPos X="8" Y="226"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+      </Unit46>
+      <Unit47>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\fgl.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="120"/>
+        <CursorPos X="14" Y="137"/>
+        <UsageCount Value="10"/>
+      </Unit47>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="150" Column="44" TopLine="107"/>
+        <Caret Line="231" TopLine="211"/>
       </Position1>
       <Position2>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="32" Column="25" TopLine="14"/>
+        <Caret Line="232" TopLine="211"/>
       </Position2>
       <Position3>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="211" Column="23" TopLine="191"/>
+        <Caret Line="233" TopLine="211"/>
       </Position3>
       <Position4>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="177" Column="44" TopLine="104"/>
+        <Caret Line="235" TopLine="211"/>
       </Position4>
       <Position5>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="238" Column="23" TopLine="215"/>
+        <Caret Line="236" TopLine="211"/>
       </Position5>
       <Position6>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="21" Column="20" TopLine="6"/>
+        <Caret Line="237" TopLine="211"/>
       </Position6>
       <Position7>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="36" Column="25" TopLine="19"/>
+        <Caret Line="238" TopLine="211"/>
       </Position7>
       <Position8>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="235" Column="3" TopLine="227"/>
+        <Caret Line="239" TopLine="211"/>
       </Position8>
       <Position9>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="33" Column="14" TopLine="15"/>
+        <Caret Line="240" TopLine="211"/>
       </Position9>
       <Position10>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="218" Column="29" TopLine="205"/>
+        <Caret Line="242" TopLine="213"/>
       </Position10>
       <Position11>
-        <Filename Value="main.pas"/>
-        <Caret Line="1059" Column="46" TopLine="1040"/>
+        <Filename Value="entities_definition.pas"/>
+        <Caret Line="245" TopLine="216"/>
       </Position11>
       <Position12>
-        <Filename Value="main.pas"/>
-        <Caret Line="1056" Column="35" TopLine="1028"/>
+        <Filename Value="entities_definition.pas"/>
+        <Caret Line="230" Column="13" TopLine="202"/>
       </Position12>
       <Position13>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="36" Column="14" TopLine="18"/>
+        <Caret Line="200" TopLine="193"/>
       </Position13>
       <Position14>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="237" Column="3" TopLine="229"/>
+        <Caret Line="198" TopLine="191"/>
       </Position14>
       <Position15>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="33" Column="14" TopLine="15"/>
+        <Caret Line="207" Column="19" TopLine="191"/>
       </Position15>
       <Position16>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="197" TopLine="179"/>
+        <Caret Line="225" TopLine="196"/>
       </Position16>
       <Position17>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="198" TopLine="179"/>
+        <Caret Line="226" TopLine="197"/>
       </Position17>
       <Position18>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="199" TopLine="179"/>
+        <Caret Line="218" Column="45" TopLine="193"/>
       </Position18>
       <Position19>
-        <Filename Value="entities_definition.pas"/>
-        <Caret Line="200" TopLine="179"/>
+        <Filename Value="apiglio_tree.pas"/>
+        <Caret Line="845" TopLine="827"/>
       </Position19>
       <Position20>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="202" TopLine="179"/>
+        <Caret Line="243" Column="13" TopLine="220"/>
       </Position20>
       <Position21>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="203" TopLine="179"/>
+        <Caret Line="103" Column="39" TopLine="80"/>
       </Position21>
       <Position22>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="200" Column="26" TopLine="179"/>
+        <Caret Line="85" Column="5" TopLine="67"/>
       </Position22>
       <Position23>
-        <Filename Value="entities_definition.pas"/>
-        <Caret Line="206" TopLine="179"/>
+        <Filename Value="..\FileAccess-SHP\apiglio_shapefile.pas"/>
+        <Caret Line="46" Column="23" TopLine="30"/>
       </Position23>
       <Position24>
-        <Filename Value="entities_definition.pas"/>
-        <Caret Line="207" TopLine="179"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="17" Column="34"/>
       </Position24>
       <Position25>
         <Filename Value="main.pas"/>
-        <Caret Line="1066" Column="83" TopLine="1043"/>
+        <Caret Line="1066" Column="61" TopLine="1044"/>
       </Position25>
       <Position26>
-        <Filename Value="main.pas"/>
-        <Caret Line="1064" Column="31" TopLine="1037"/>
+        <Filename Value="entities_definition.pas"/>
+        <Caret Line="30" Column="15" TopLine="12"/>
       </Position26>
       <Position27>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="36" Column="14" TopLine="18"/>
+        <Caret Line="93" Column="17" TopLine="80"/>
       </Position27>
       <Position28>
         <Filename Value="entities_definition.pas"/>
-        <Caret Line="236" Column="3" TopLine="228"/>
+        <Caret Line="96" Column="30" TopLine="89"/>
       </Position28>
       <Position29>
-        <Filename Value="entities_definition.pas"/>
-        <Caret Line="32" Column="14" TopLine="14"/>
+        <Filename Value="..\FileAccess-SHP\apiglio_geo.pas"/>
+        <Caret Line="41" Column="14" TopLine="23"/>
       </Position29>
+      <Position30>
+        <Filename Value="..\FileAccess-SHP\apiglio_geo.pas"/>
+        <Caret Line="33" Column="15" TopLine="15"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
@@ -572,39 +530,16 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="main.pas"/>
-        <Line Value="1053"/>
+        <Line Value="1054"/>
       </Item1>
     </BreakPoints>
-    <Watches Count="8">
+    <Watches Count="2">
       <Item1>
-        <Expression Value="yy"/>
+        <Expression Value="tmp"/>
       </Item1>
       <Item2>
-        <Expression Value="adapter"/>
-        <DisplayStyle Value="wdfHex"/>
+        <Expression Value="extra_note"/>
       </Item2>
-      <Item3>
-        <Expression Value="tmpTest"/>
-      </Item3>
-      <Item4>
-        <Expression Value="tmp"/>
-        <DisplayStyle Value="wdfHex"/>
-      </Item4>
-      <Item5>
-        <Expression Value="px"/>
-        <DisplayStyle Value="wdfHex"/>
-      </Item5>
-      <Item6>
-        <Expression Value="py"/>
-        <DisplayStyle Value="wdfHex"/>
-      </Item6>
-      <Item7>
-        <Expression Value="pz"/>
-        <DisplayStyle Value="wdfHex"/>
-      </Item7>
-      <Item8>
-        <Expression Value="tree.Current.obj"/>
-      </Item8>
     </Watches>
   </Debugging>
 </CONFIG>

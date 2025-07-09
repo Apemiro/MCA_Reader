@@ -17,6 +17,7 @@ type
     motion,pos:record
       x,y,z:double;
     end;
+    note:string;
   public
     function to_csv_line:string;
   end;
@@ -87,18 +88,19 @@ begin
   tmpSHP:=TShapeFile.Create(shpPoint);
   tmpSHP.AddField('ent_name',gptChar);//1
   tmpSHP.AddField('rotation',gptFloat);//2
-  tmpSHP.AddField('elevation',gptFixNum);//3
+  tmpSHP.AddField('elevation',gptFloat);//3
+  tmpSHP.AddField('note',gptChar);//4
+
   for fid:=0 to Self.Count-1 do
     begin
       fea:=TAGeoPoint.Create;
-
       fea.Point.x:=TEntityUnit(Self.Items[fid]).pos.x;
       fea.Point.y:=-TEntityUnit(Self.Items[fid]).pos.z;
       fea.Point.z:=TEntityUnit(Self.Items[fid]).pos.y;
       fea.Char[1]:=TEntityUnit(Self.Items[fid]).id;
       fea.Float[2]:=TEntityUnit(Self.Items[fid]).rotation.h;
-      fea.FixNum[3]:=trunc(TEntityUnit(Self.Items[fid]).pos.z);
-
+      fea.Float[3]:=TEntityUnit(Self.Items[fid]).pos.y;
+      fea.Char[4]:=TEntityUnit(Self.Items[fid]).note;
       {
       fea.Point.x:=0;
       fea.Point.y:=0;
@@ -108,6 +110,7 @@ begin
       }
       tmpSHP.AddFeature(fea);
     end;
+
   tmpSHP.SaveToFile(filename_without_ext);
 end;
 
@@ -181,6 +184,8 @@ var tmp:TAListUnit;
     node:TATreeUnit;
     px,py,pz:Integer;
     ent_id:string;
+    extra_note:string;
+
 begin
     result:=false;
     tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
@@ -199,28 +204,43 @@ begin
         tree.CurrentOut;
 
         tree.CurrentInto('x');
-        px:=tree.Current.AInt;
+        px:=tree.Current.RInt;
         tree.CurrentOut;
 
         tree.CurrentInto('y');
-        py:=tree.Current.AInt;
+        py:=tree.Current.RInt;
         tree.CurrentOut;
 
         tree.CurrentInto('z');
-        pz:=tree.Current.AInt;
+        pz:=tree.Current.RInt;
         tree.CurrentOut;
+
+        //临时的读取结构
+        if ent_id='minecraft:mob_spawner' then begin
+            node:=tree.Current;
+            tree.CurrentInto('SpawnData');
+            tree.CurrentInto('entity');
+            tree.CurrentInto('id');
+            if tree.Current.NbtType = NBT_String then
+                extra_note:=tree.Current.AString;
+            tree.CurrentInto(node);
+        end;
+        if extra_note='' then extra_note:=' ';
 
         tree.CurrentOut;
 
         with AddEntity(ent_id) do begin
             rotation.h:=0;
             rotation.v:=0;
+
             pos.x:=px;
             pos.y:=py;
             pos.z:=pz;
             motion.x:=0;
             motion.y:=0;
             motion.z:=0;
+
+            note:=extra_note;
         end;
 
         tmp:=tmp.next;
