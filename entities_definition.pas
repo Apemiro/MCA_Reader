@@ -23,7 +23,9 @@ type
   end;
 
   TEntities=class(TList)
-
+  public
+    LoadEntities:boolean;
+    LoadTileEnts:boolean;
   public
     function AddEntity(ent_id:string):TEntityUnit;
     procedure SaveToCSV(filename:string);
@@ -200,6 +202,7 @@ begin
         tree.CurrentInto(tmp.obj as TATreeUnit);
 
         tree.CurrentInto('id');
+        ent_id:='';
         ent_id:=tree.Current.AString;
         tree.CurrentOut;
 
@@ -255,14 +258,16 @@ function TEntities.LoadFromTree(tree:TATree):boolean;
 begin
   result:=false;
   if not OnlyOneChunk(tree) then exit;
-  ExtractEntities_164(tree);
-  ExtractBlockEntities_164(tree);
+  if LoadEntities then ExtractEntities_164(tree);
+  if LoadTileEnts then ExtractBlockEntities_164(tree);
   result:=true;
 end;
 
 constructor TEntities.Create;
 begin
   inherited Create;
+  LoadEntities:=true;
+  LoadTileEnts:=true;
 end;
 
 destructor TEntities.Destroy;

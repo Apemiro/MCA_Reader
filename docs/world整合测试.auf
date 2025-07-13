@@ -1,0 +1,6 @@
+var object w
+world.new  @w, "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202507121250 - forEditing"
+world.read @w
+world.save @w
+world.del  @w
+unvar w

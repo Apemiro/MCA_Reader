@@ -15,7 +15,7 @@ uses
   StdCtrls, ComCtrls, Menus, Windows
   {$ifndef insert}, Apiglio_Useful, Auf_Ram_Var, aufscript_frame, apiglio_tree,
   entities_definition, blocks_definition, mca_tile, mca_base, color_rule,
-  selection_rule{$endif};
+  selection_rule, mc_world{$endif};
 
 const version_number='2.0';
 
@@ -1077,6 +1077,59 @@ begin
 end;
 
 
+procedure Func_newWorld(Sender:TObject); //world.new @w, path
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    arv:TAufRamVar;
+    obj:TObject;
+    pathname:string;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToARV(1, 8, 8, [ARV_FixNum], arv) then exit;
+  if not AAuf.TryArgToString(2, pathname) then exit;
+  obj:=TMC_World.Create(pathname);
+  obj_to_arv(obj, arv);
+end;
+
+procedure Func_readWorld(Sender:TObject); //world.read @w
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(2) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  (obj as TMC_World).ReadWorld;
+end;
+
+procedure Func_saveWorld(Sender:TObject); //world.save @w
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(2) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  (obj as TMC_World).SaveToPath;
+end;
+
+procedure Func_delWorld(Sender:TObject); //world.del @w
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(2) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  (obj as TMC_World).Free;
+end;
+
+
 procedure TFormMain.AufInit(scpt:TAufScript);
 begin
 
@@ -1139,6 +1192,12 @@ begin
 
     //整合功能
     add_func('geof',@Func_MCA_GeoFormatting,'filename,dir','将mca文件转化为同名的tif文件和shp文件');
+
+    add_func('world.new',@Func_newWorld,'@w, filename','导入存档');
+    add_func('world.read',@Func_readWorld,'@w','读取存档');
+    add_func('world.save',@Func_saveWorld,'@w','按设置导出存档');
+    add_func('world.del',@Func_delWorld,'@w','按设置导出存档');
+
 
     //临时存在
     add_func('read_tile',@Func_MCA2Tile,'filename[,x,z]','从mca文件到Tile');

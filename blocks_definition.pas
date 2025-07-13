@@ -70,11 +70,11 @@ begin
   result:='';
   itmp:=0;
   for stmp in Self.FBlockList do begin
-    result:=result+Delimiter+IntToStr(itmp)+': '+stmp;
+    result:=result+IntToStr(itmp)+': "'+stmp+'"'+Delimiter;
     inc(itmp);
   end;
   dlen:=length(Delimiter);
-  //if itmp>0 then System.Delete(result,length(result)-dlen+1,dlen);//删除最后一个分隔符计算错误，也不需要删除
+  if itmp>0 then System.Delete(result,length(result)-dlen+1,dlen);
 end;
 
 function TBlockList.FindBlockId(block_name:string):Integer;
