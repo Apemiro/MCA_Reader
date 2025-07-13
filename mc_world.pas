@@ -228,6 +228,7 @@ begin
 
     AssignFile(arcpy_automation, FExportPath+_sep_+'arcpy_automation.py');
     Rewrite(arcpy_automation);
+    WriteLn(arcpy_automation,'import arcpy');
     WriteLn(arcpy_automation,'arcpy.env.workspace = r"'+FFolderPath+_sep_+'MCA_Reader'+'"');
     WriteLn(arcpy_automation,'b2=arcpy.Raster("blockplan.tif/Band_2")');
     WriteLn(arcpy_automation,'b3=arcpy.Raster("blockplan.tif/Band_3")');

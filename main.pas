@@ -1129,6 +1129,34 @@ begin
   (obj as TMC_World).Free;
 end;
 
+procedure Func_setWorldProjection(Sender:TObject); //world.setprj @w, prj
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+    prj:string;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  if not AAuf.TryArgToStrParam(2, ['clip','above','below','top','surface'], false, prj) then exit;
+  (obj as TMC_World).DisplaySetting.Projection:=prj;
+end;
+
+procedure Func_setWorldClipfloor(Sender:TObject); //world.setfloor @w, floor
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+    floor:LongInt;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  if not AAuf.TryArgToLong(2, floor) then exit;
+  (obj as TMC_World).DisplaySetting.ClipFloor:=floor;
+end;
+
 
 procedure TFormMain.AufInit(scpt:TAufScript);
 begin
@@ -1197,6 +1225,8 @@ begin
     add_func('world.read',@Func_readWorld,'@w','读取存档');
     add_func('world.save',@Func_saveWorld,'@w','按设置导出存档');
     add_func('world.del',@Func_delWorld,'@w','按设置导出存档');
+    add_func('world.setprj',@Func_setWorldProjection,'@w, prj','设置存档的三维到二维的投影');
+    add_func('world.setfloor',@Func_setWorldClipfloor,'@w, floor','设置存档的三维到二维的特征层');
 
 
     //临时存在

@@ -1,5 +1,8 @@
 var object w
-world.new  @w, "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202507121250 - forEditing"
+world.new  @w, "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202507131234 - forEditing"
+world.setprj @w, "below"
+world.setfloor @w, 66
+
 world.read @w
 world.save @w
 world.del  @w

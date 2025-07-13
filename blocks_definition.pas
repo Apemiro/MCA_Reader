@@ -92,10 +92,10 @@ begin
 end;
 
 function TBlockList.AddBlockId(block_name:string):Integer;
-var pi:integer;
 begin
   result:=FindBlockId(block_name);
   if result>=0 then exit;
+  result:=FBlockList.Count;
   Self.FBlockList.AddText(block_name);
 end;
 
