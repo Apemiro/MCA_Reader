@@ -1157,6 +1157,47 @@ begin
   (obj as TMC_World).DisplaySetting.ClipFloor:=floor;
 end;
 
+procedure Func_setWorldDimension(Sender:TObject); //world.setdim @w, overworld/nether/end
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+    dimension:string;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  if not AAuf.TryArgToStrParam(2, ['overworld','over','nether','thenether','end','theend'], false, dimension) then exit;
+  case dimension of
+      'overworld', 'over':      (obj as TMC_World).DisplaySetting.Dimension:=wdOverWorld;
+      'nether',    'thenether': (obj as TMC_World).DisplaySetting.Dimension:=wdTheNether;
+      'end',       'theend':    (obj as TMC_World).DisplaySetting.Dimension:=wdTheEnd;
+  end;
+end;
+
+procedure Func_setWorldSave(Sender:TObject); //world.setsave @w, json/chk on/off
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+    mode,onoff:string;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(4) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  if not AAuf.TryArgToStrParam(2, ['json','chk'], false, mode) then exit;
+  if not AAuf.TryArgToStrParam(3, ['on','off'], false, onoff) then exit;
+  case mode of
+      'json':case onoff of
+          'on':(obj as TMC_World).WorldSetting.SaveJson:=true;
+          'off':(obj as TMC_World).WorldSetting.SaveJson:=false;
+      end;
+      'chk' :case onoff of
+          'on':(obj as TMC_World).WorldSetting.SaveChk:=true;
+          'off':(obj as TMC_World).WorldSetting.SaveChk:=false;
+      end;
+  end;
+end;
 
 procedure TFormMain.AufInit(scpt:TAufScript);
 begin
@@ -1227,6 +1268,8 @@ begin
     add_func('world.del',@Func_delWorld,'@w','按设置导出存档');
     add_func('world.setprj',@Func_setWorldProjection,'@w, prj','设置存档的三维到二维的投影');
     add_func('world.setfloor',@Func_setWorldClipfloor,'@w, floor','设置存档的三维到二维的特征层');
+    add_func('world.setdim',@Func_setWorldDimension,'@w, overworld/nether/end','设置存档读取维度');
+    add_func('world.setsave',@Func_setWorldSave,'@w, savefile, on/off','设置存档存档文件保存与否');
 
 
     //临时存在

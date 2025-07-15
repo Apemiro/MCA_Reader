@@ -36,6 +36,8 @@ type
         WorldSetting   : record
             Platform       : TMC_World_Platform;
             Version        : string;
+            SaveChk        : boolean;
+            SaveJson       : boolean;
         end;
         DisplaySetting : record
             Dimension      : TMC_World_Dimension;
@@ -63,7 +65,7 @@ procedure TMC_World.readRegion;
 var mca_file_list:TStringList;
     mca_file_name:string;
     MCA_file_path:string;
-    chunkId:integer;
+    chunkId,xPos,zPos:integer;
     mca:TMCA_Stream;
     chk:TChunk_Stream;
     blk:TChunk_Block;
@@ -106,17 +108,26 @@ begin
         for mca_file_name in mca_file_list do begin
             mca.LoadFromFile(mca_file_name);
             for chunkId:=0 to 1023 do begin
+                xPos:=512*mca.x+chunkId mod 32;
+                zPos:=512*mca.z+chunkId div 32;
                 if not mca.ChunkAvailable(chunkId) then continue;
                 if not chk.LoadFromMCA(chunkId,mca) then continue;
                 tree.Clear;
                 chk.Decode(tree);
+                if WorldSetting.SaveJson then
+                    tree.PrintJSON(Format('%s%stree[%d,%d].json',[FExportPath, _sep_, xPos, zPos]));
+
 
                 with DisplaySetting do begin
                     if (weoBiome in ExportOpts)
                       or (weoHeight in ExportOpts)
                       or (weoBlockPlan in ExportOpts)
-                        then blk.LoadFromTree(tree);
-
+                      or WorldSetting.SaveChk
+                        then begin
+                            blk.LoadFromTree(tree);
+                            if WorldSetting.SaveChk then
+                                blk.SaveByteToFile(Format('%s%sblocks[%d,%d].chk',[FExportPath, _sep_, xPos, zPos]));
+                        end;
                     if weoBlockPlan in ExportOpts then
                         FBlockPlan.GetChunkPlan(blk, Projection, ClipFloor, Byte(smExclude), PSelection);
                     if weoHeight in ExportOpts then
@@ -253,6 +264,7 @@ begin
     WriteLn(arcpy_automation,'        name = biomemap.get(row[0])');
     WriteLn(arcpy_automation,'        row[1] = name if name!=None else ""');
     WriteLn(arcpy_automation,'        cursor.updateRow(row)');
+    WriteLn(arcpy_automation,'None # 避免复制到ArcGIS时的卡顿');
 
 
     CloseFile(arcpy_automation);
@@ -265,8 +277,11 @@ begin
     inherited Create;
     FFolderPath:=Path;
     FExportPath:=Path+_sep_+'MCA_Reader';
+    ForceDirectories(FExportPath);
     with WorldSetting do begin
         Platform   := wpJava;
+        SaveChk    := false;
+        SaveJson   := false;
     end;
     with DisplaySetting do begin
         Dimension  := wdOverWorld;
