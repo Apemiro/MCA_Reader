@@ -19,8 +19,6 @@ type
     FBitMap:TBitMap;
     FPosition:TMCPoint;//MCA块的编号，与r.x.z.mca相同
     FOffset:TMCPoint;//Get*方法时需要设置的相对区块位置
-    //FBlockId:TMemoryStream;
-    //FBlockData:TMemoryStream;
   protected
     procedure SetBlockId(x,z:integer;id:word);
     procedure SetBlockData(x,z:integer;data:byte);
@@ -33,11 +31,6 @@ type
     property Offset:TMCPoint read FOffset write FOffset;
     procedure SetOffset(x,z:integer);
   public
-    {
-    procedure GetClip(chunkblock:TMemoryStream;y:byte);//从chunkblock提取方块平面图，使用前要使用SetOffset
-    procedure GetBelow(chunkblock:TMemoryStream;y:byte);//从chunkblock提取方块平面图，使用前要使用SetOffset
-    procedure GetAbove(chunkblock:TMemoryStream;y:byte);//从chunkblock提取方块平面图，使用前要使用SetOffset
-    }
     procedure GetBiomesClip(block:TChunk_Block;y:integer);
     procedure GetClip(block:TChunk_Block;y:integer);
     procedure GetSurface(block:TChunk_Block;mode:string='ws');
