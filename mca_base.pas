@@ -690,8 +690,7 @@ begin
         FStream.position:=SectionsId*4096*4+0;
         for pi:=0 to tree.Current.size do
           begin
-            buffer:=tree.Current.ALongArray[pi];
-            buffer:=SwapEndian(buffer);
+            buffer:=tree.Current.RLongArray[pi];
             for bindex:=0 to btimes do
               begin
                 FStream.WriteDWord(block_defs[buffer and band]);
@@ -707,7 +706,7 @@ begin
             buffer:=pword(mem+((4095-pi)*9 div 8))^;
             buffer:=SwapEndian(buffer);
             buffer:=buffer shr ((((4095-pi)+2)*bsh div 8)*8 - (4095-pi)*bsh-bsh);
-            FStream.WriteDWord(block_defs[buffer and band]);
+            FStream.WriteDWord(block_defs[buffer and band] shl 8);
           end;
         freemem(mem,36*8+1);
 
@@ -822,7 +821,7 @@ begin
         band:=$0000000000000FFF;btimes:=4;bsh:=12;
       end;
 
-      if tree.Current.size = ceil(4096/(btimes+1)) then begin //1.16
+      if tree.Current.size = ceil(4096/(btimes+1)) then begin
         if SectionsId>=0 then begin
           pStream:=FStream;
           pStream.position:=SectionsId*4096*4+0;
@@ -832,11 +831,10 @@ begin
         end;
         for pi:=0 to tree.Current.size do
           begin
-            buffer:=tree.Current.ALongArray[pi];
-            buffer:=SwapEndian(buffer);
+            buffer:=tree.Current.RLongArray[pi];
             for bindex:=0 to btimes do
               begin
-                pStream.WriteDWord(block_defs[buffer and band]);
+                pStream.WriteDWord(block_defs[buffer and band] shl 8);
                 buffer:=buffer shr bsh;
               end;
           end;
