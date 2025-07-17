@@ -1,8 +1,8 @@
 var object w
 world.new  @w, "D:\Minecraft\HMCL_CON_BX\.minecraft\saves\热带海湾 - 202507151050 - forEditing"
 world.setprj @w, "clip"
-world.setfloor @w, -12
-//world.setdim @w, TheNether
+world.setfloor @w, 45
+world.setdim @w, TheNether
 //world.setsave @w, chk, on
 
 world.read @w

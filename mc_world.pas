@@ -228,6 +228,7 @@ end;
 
 procedure TMC_World.SaveToPath;
 var arcpy_automation:text;
+    block_list:string;
 begin
     if not ForceDirectories(FExportPath) then raise Exception.Create('无法创建路径：'+FExportPath);
     FBlockPlan.SaveAsTiff(FExportPath+_sep_+'blockplan');
@@ -240,12 +241,14 @@ begin
     Rewrite(arcpy_automation);
     WriteLn(arcpy_automation,'import arcpy');
     WriteLn(arcpy_automation,'arcpy.env.workspace = r"'+FFolderPath+_sep_+'MCA_Reader'+'"');
-    WriteLn(arcpy_automation,'b1=arcpy.Raster("blockplan.tif/Band_1")');
     WriteLn(arcpy_automation,'b2=arcpy.Raster("blockplan.tif/Band_2")');
-    WriteLn(arcpy_automation,'block = b1*256+b2');
+    WriteLn(arcpy_automation,'b3=arcpy.Raster("blockplan.tif/Band_3")');
+    WriteLn(arcpy_automation,'block = b2*256+b3');
     WriteLn(arcpy_automation,'block.save("blockplan_stat.tif")');
     WriteLn(arcpy_automation,'arcpy.management.AddField("blockplan_stat.tif","NAME","TEXT",field_length=50)');
-    WriteLn(arcpy_automation,'blockmap={'+defaultBlocks.ExportToString(',')+'}');
+    block_list:=DisplaySetting.Palette.ExportToString('%u:"%s",');
+    System.Delete(block_list, Length(block_list), 1);
+    WriteLn(arcpy_automation,'blockmap={'+block_list+'}');
     WriteLn(arcpy_automation,'biomemap={'+defaultBiomes.ExportToString(',')+'}');
     //WriteLn(arcpy_automation,'POImap='+defaultPOIs.ExportToString(','));
     WriteLn(arcpy_automation,'with arcpy.da.UpdateCursor("blockplan_stat.tif",["VALUE","NAME"]) as cursor:');

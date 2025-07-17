@@ -10,14 +10,18 @@ uses
 
 type
 
-    TMC_Block = record case integer of
-        0:(vDWord:dword); //RGBa = add blk dat nul
-        1:(vBands:array[0..3]of byte);
-        2:(
-           vBlock:word;
-           vData:byte;
-           vNull:byte
-           );
+    TMC_Block = record
+        vDWord:dword;
+        function GetBlock:word;
+        function GetData:byte;
+        function GetNull:byte;
+        procedure SetBlock(block:word);
+        procedure SetData(data:byte);
+        procedure SetNull(nul:byte);
+    public
+        property vBlock:word read GetBlock write SetBlock;
+        property vData:byte read GetData write SetData;
+        property vNull:byte read GetNull write SetNull;
     end;
 
     TMC_PaletteRecord = record
@@ -52,6 +56,9 @@ type
         procedure ClearSectionPatette;
         procedure AppendSectionPatette(BlockName:string);
         function FindBlockBySectionId(SectionId:integer):PMC_PaletteRecord;
+
+        function ExportToString(FormatStr:string='%u : "%s",'):string;
+
         property ReverseRejection:Boolean read FReverseRejection write FReverseRejection;
         property BlockItems[index:integer]:PMC_PaletteRecord read GetBlockItem;
         property BlockListSize:integer read GetBlockListSize;
@@ -63,9 +70,42 @@ type
 
 implementation
 
+
+function TMC_Block.GetBlock:word;
+begin
+    result:=vDWord shr 16;
+end;
+
+function TMC_Block.GetData:byte;
+begin
+    result:=(vDWord and $ffff) shr 8;
+end;
+
+function TMC_Block.GetNull:byte;
+begin
+    result:=vDWord and $ff;
+end;
+
+procedure TMC_Block.SetBlock(block:word);
+begin
+    vDWord:=(vDWord and $ffff) or (dword(block) shl 16);
+end;
+
+procedure TMC_Block.SetData(data:byte);
+begin
+    vDWord:=(vDWord and $ffff00ff) or (dword(data) shl 8);
+end;
+
+procedure TMC_Block.SetNull(nul:byte);
+begin
+    vDWord:=(vDWord and $ffffff00) or nul;
+end;
+
 function TMC_PaletteRecord.GetValue_Raw:TMC_Block;
 begin
-    result:=TMC_Block((DWord(id) shl 16) or (data shl 8));
+    result.vDWord:=id;
+    result.vData:=data;
+    result.vNull:=$AA;
 end;
 
 function TMC_PaletteRecord.GetValue_Colorize:TMC_Block;
@@ -158,6 +198,18 @@ begin
         raise Exception.Create('TMC_Palette.FindBlockBySectionId cannot match the section ID.');
     end;
     result:=FSection[SectionId];
+end;
+
+function TMC_Palette.ExportToString(FormatStr:string='%u : "%s",'):string;
+var idx,len:integer;
+    block_name:string;
+begin
+    result:='';
+    len:=FUniverse.Count-1;
+    for idx:=0 to len do begin
+        block_name:=FUniverse[idx];
+        result:=result+Format(FormatStr,[PMC_PaletteRecord(FUniverse.Objects[idx])^.id, block_name]);
+    end;
 end;
 
 constructor TMC_Palette.Create;

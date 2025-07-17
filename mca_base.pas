@@ -763,7 +763,7 @@ begin
       if not tree.CurrentInto('block_states') then raise Exception.Create('block_states');
       if tree.CurrentInto('palette') then
         begin
-          writeln('number of palette: ',tree.Current.Achild.count);
+          //writeln('number of palette: ',tree.Current.Achild.count);
           palette.ClearSectionPatette;
           palette_unit:=tree.Current.Achild.first;
           pi:=0;
@@ -774,7 +774,7 @@ begin
               block_name:=tree.Current.AString;
               palette.AddBlock(block_name);
               palette.AppendSectionPatette(block_name);
-              writeln('univ: ',palette.BlockListSize,'  sect: ',palette.SectionsSize,'  blockname:',block_name);
+              //writeln('univ: ',palette.BlockListSize,'  sect: ',palette.SectionsSize,'  blockname:',block_name);
               //block_defs[pi]:=defaultBlocks.AddBlockId(tree.Current.AString);
               inc(pi);
               palette_unit:=palette_unit.next;
@@ -814,6 +814,8 @@ begin
         continue; // 无data就用Palette[0]填充整个子区块
       end;
 
+      //writeln(palette.ExportToString('%8x : %s'+#13#10));
+
       if palette_count<=16 then begin
         band:=$000000000000000F;btimes:=15;bsh:=4;
       end else if palette_count<=32 then begin
@@ -848,7 +850,12 @@ begin
             for bindex:=0 to btimes do
               begin
                 //pStream.WriteDWord(block_defs[buffer and band] shl 8);
-                pStream.WriteDWord(palette.FindBlockBySectionId(buffer and band)^.GetValue_Raw.vDWord);
+                if (buffer and band)<palette_count then begin
+                    adapter:=palette.FindBlockBySectionId(buffer and band)^.GetValue_Raw;
+                    pStream.WriteDWord(adapter.vDWord);//事实上我根本不用管nul这一位，始终弃用，所以也不需要shl 8, 也没用
+                end else begin
+                    //这里不知道为什么会有不在色板内的数据
+                end;
                 buffer:=buffer shr bsh;
               end;
           end;

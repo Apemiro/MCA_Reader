@@ -1168,7 +1168,7 @@ begin
   if not AAuf.CheckArgs(3) then exit;
   if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
   if not AAuf.TryArgToStrParam(2, ['overworld','over','nether','thenether','end','theend'], false, dimension) then exit;
-  case dimension of
+  case lowercase(dimension) of
       'overworld', 'over':      (obj as TMC_World).DisplaySetting.Dimension:=wdOverWorld;
       'nether',    'thenether': (obj as TMC_World).DisplaySetting.Dimension:=wdTheNether;
       'end',       'theend':    (obj as TMC_World).DisplaySetting.Dimension:=wdTheEnd;

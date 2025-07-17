@@ -286,11 +286,14 @@ begin
                 block.SBelow.position:=-((yy+1) div 16) shl 14 + ((yy+16) mod 16) shl 10 + (z*16+x)*4;
                 adapter.vDWord:=block.SBelow.ReadDWord;
             end;
+            adapter.vData:=z;
+            adapter.vNull:=z;
             if palette<>nil then begin
                 pPR:=palette.BlockItems[adapter.vBlock];
                 if pPR<>nil then
                     if not pPR^.rejected xor palette.ReverseRejection then begin
                         pdword(Self.FBitMap.ScanLine[z+Offset.z]+4*(x+Offset.x))^:=adapter.vDWord;
+                        //write(' ',IntToHex(adapter.vDWord,8));
                         break;
                     end;
             end;
@@ -646,6 +649,7 @@ begin
           begin
             dtmp.vd:=pdword(tmp_tile.FBitMap.ScanLine[wth]+4*wtf)^;
             pdword(Picture.Bitmap.ScanLine[dstRect.Top+wth]+4*(dstRect.Left+wtf))^:=dtmp.vd;
+            //if dtmp.vd<>0 then write(' ',IntToHex(dtmp.vd,8));
           end;
       tmp_tile.FBitMap.EndUpdate;
       //}
