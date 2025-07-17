@@ -1,7 +1,7 @@
 program MCA_Reader;
 
 {$mode objfpc}{$H+}
-//{$APPTYPE CONSOLE}
+{$APPTYPE CONSOLE}
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}

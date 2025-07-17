@@ -139,7 +139,7 @@ var AufScpt:TAufScript;
     chunk:TChunk_Stream;
     blocks:TChunk_Block;
     tree:TATree;
-    sel:TSelectionRule;
+    //sel:TSelectionRule;
 begin
   AufScpt:=Sender as TAufScript;
   AAuf:=AufScpt.Auf as TAuf;
@@ -150,8 +150,8 @@ begin
   chunk:=TChunk_Stream.Create;
   tree:=TATree.Create;
   blocks:=TChunk_Block.Create;
-  sel:=TSelectionRule.Create;
-  sel.AddBlock(473);
+  //sel:=TSelectionRule.Create;
+  //sel.AddBlock(473);
 
   mca.LoadFromFile(filename);
   for chunkN:=0 to 1023 do
@@ -162,9 +162,9 @@ begin
         if not chunk.LoadFromMCA(chunkN,mca) then continue;
         tree.Clear;
         chunk.Decode(tree);
-        blocks.LoadFromTree(tree);
+        blocks.LoadFromTree(tree, nil);
         //MCA_Tile_List.GetChunkPlan(blocks,'top',0,Byte(smExclude),sel);
-        MCA_Tile_List.GetChunkPlan(blocks,'realheight',0,Byte(smExclude),sel);
+        MCA_Tile_List.Projection(blocks,'realheight',0,nil);
 
       except
         AufScpt.writeln('警告：mca['+IntToStr(mca.x)+','+IntToStr(mca.z)+'].chunk['+IntToStr(chunkN)+']读取失败。');
@@ -174,7 +174,7 @@ begin
       end;
     end;
 
-  sel.Free;
+  //sel.Free;
   blocks.Free;
   tree.Free;
   chunk.Free;
@@ -596,7 +596,7 @@ begin
       AufScpt.send_error('警告：第一个参数不能转化为TATree对象，代码未执行。');
       exit
     end;
-  (blk_obj as TChunk_Block).LoadFromTree(tree_obj as TAtree);
+  (blk_obj as TChunk_Block).LoadFromTree(tree_obj as TAtree, nil);
 end;
 procedure Func_Block2Txt(Sender:TObject);//xxx $8[]
 var AufScpt:TAufScript;
@@ -782,14 +782,14 @@ begin
         if not AAuf.CheckArgs(4) then begin AufScpt.send_error('getbiomes需要3个参数，投影未执行。');exit end;
         if not AAuf.TryArgToDWord(3,floor) then exit;
         if (floor<0) or (floor>255) then begin AufScpt.send_error('getbiomes的p1需要在0-255范围内，投影未执行。');exit end;
-        (tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'biomes',floor);
+        (tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'biomes',floor);
       end;
     'tile.getclip':
       begin
         if not AAuf.CheckArgs(4) then begin AufScpt.send_error('getclip需要3个参数，投影未执行。');exit end;
         if not AAuf.TryArgToDWord(3,floor) then exit;
         if (floor<0) or (floor>255) then begin AufScpt.send_error('getclip的p1需要在0-255范围内，投影未执行。');exit end;
-        (tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'clip',floor);
+        (tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'clip',floor);
       end;
     'tile.getbelow':
       begin
@@ -803,7 +803,7 @@ begin
             AufScpt.send_error('getbelow需要3或5个参数，投影未执行。');exit
           end;
         end;
-        (tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'below',floor,Byte(sel_mode),sel_obj);
+        (tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'below',floor,nil);
       end;
     'tile.getabove':
       begin
@@ -817,10 +817,10 @@ begin
             AufScpt.send_error('getabove需要3或5个参数，投影未执行。');exit
           end;
         end;
-        (tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'above',floor,Byte(sel_mode),sel_obj);
+        (tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'above',floor,nil);
       end;
-    'tile.getheight':(tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'height');
-    'tile.getsurface':(tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'surface');
+    'tile.getheight':(tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'height');
+    'tile.getsurface':(tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'surface');
     'tile.gettop':
       begin
         case AAuf.ArgsCount of
@@ -830,7 +830,7 @@ begin
             AufScpt.send_error('gettop需要2或4个参数，投影未执行。');exit
           end;
         end;
-        (tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'top',floor,Byte(sel_mode),sel_obj);
+        (tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'top',floor,nil);
       end;
     'tile.getrealheight':
       begin
@@ -841,7 +841,7 @@ begin
             AufScpt.send_error('getrealheight需要2或4个参数，投影未执行。');exit
           end;
         end;
-        (tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'realheight',floor,Byte(sel_mode),sel_obj);
+        (tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'realheight',floor,nil);
       end;
     'tile.getdensity':
       begin
@@ -852,7 +852,7 @@ begin
             AufScpt.send_error('getdensity需要2或4个参数，投影未执行。');exit
           end;
         end;
-        (tile_obj as TMCA_Tile_List).GetChunkPlan(blk_obj as TChunk_Block,'realdensity',floor,Byte(sel_mode),sel_obj);
+        (tile_obj as TMCA_Tile_List).Projection(blk_obj as TChunk_Block,'realdensity',floor,nil);
       end;
     else assert(false,'tile.get*函数case错误。');
   end;
@@ -1032,7 +1032,7 @@ begin
         if not chunk.LoadFromMCA(chunkN,mca) then continue;
         tree.Clear;
         chunk.Decode(tree);
-        blocks.LoadFromTree(tree);
+        blocks.LoadFromTree(tree, nil);
 
         //重复往sel中增加，暂时的作法，之后重写selectition
         //bindex:=defaultBlocks.FindBlockId('minecraft:pointed_dripstone');
@@ -1139,7 +1139,7 @@ begin
   AAuf:=AufScpt.Auf as TAuf;
   if not AAuf.CheckArgs(3) then exit;
   if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
-  if not AAuf.TryArgToStrParam(2, ['clip','above','below','top','surface'], false, prj) then exit;
+  if not AAuf.TryArgToStrParam(2, ['clip','above','below','top','surface','density'], false, prj) then exit;
   (obj as TMC_World).DisplaySetting.Projection:=prj;
 end;
 
@@ -1187,12 +1187,12 @@ begin
   if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
   if not AAuf.TryArgToStrParam(2, ['json','chk'], false, mode) then exit;
   if not AAuf.TryArgToStrParam(3, ['on','off'], false, onoff) then exit;
-  case mode of
-      'json':case onoff of
+  case lowercase(mode) of
+      'json':case lowercase(onoff) of
           'on':(obj as TMC_World).WorldSetting.SaveJson:=true;
           'off':(obj as TMC_World).WorldSetting.SaveJson:=false;
       end;
-      'chk' :case onoff of
+      'chk' :case lowercase(onoff) of
           'on':(obj as TMC_World).WorldSetting.SaveChk:=true;
           'off':(obj as TMC_World).WorldSetting.SaveChk:=false;
       end;

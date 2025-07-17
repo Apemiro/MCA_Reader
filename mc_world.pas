@@ -7,13 +7,13 @@ interface
 uses
     Classes, SysUtils, FileUtil,
     Apiglio_Tree, blocks_definition,
-    mca_tile, mca_base, entities_definition, selection_rule;
+    mca_tile, mca_base, entities_definition, selection_rule, mc_palette;
 
 const _sep_ = DirectorySeparator;
 
 type
     TMC_World_Platform   = (wpJava, wpBedrock);
-    TMC_World_Dimension  = (wdOverWorld=0, wdTheNether=-1, wdTheEnd=1);
+    TMC_World_Dimension  = (wdTheNether=-1, wdOverWorld=0, wdTheEnd=1);
     TMC_World_Projection = STRING;
     TMC_World_ExportOpt  = (weoEntities, weoTileEnts, weoBlockPlan, weoBiome, weoHeight);
     TMC_World_ExportOpts = set of TMC_World_ExportOpt;
@@ -44,7 +44,7 @@ type
             ExportOpts     : TMC_World_ExportOpts;
             Projection     : TMC_World_Projection;
             ClipFloor      : Integer;
-            PSelection     : TSelectionRule;
+            Palette        : TMC_Palette;
         end;
     protected
         procedure ReadRegion;
@@ -79,17 +79,17 @@ begin
         end;
         wdTheNether:
         begin
-            MCA_file_path:='DIM-1';
+            MCA_file_path:='DIM-1'+_sep_+'region';
             if not DirectoryExists(FFolderPath+_sep_+MCA_file_path) then begin
-                MCA_file_path:='DIM-1'+_sep_+'region';
+                MCA_file_path:='DIM-1';
                 if not DirectoryExists(FFolderPath+_sep_+MCA_file_path) then MCA_file_path:='';
             end;
         end;
         wdTheEnd:
         begin
-            MCA_file_path:='DIM1';
+            MCA_file_path:='DIM1'+_sep_+'region';
             if not DirectoryExists(FFolderPath+_sep_+MCA_file_path) then begin
-                MCA_file_path:='DIM1'+_sep_+'region';
+                MCA_file_path:='DIM1';
                 if not DirectoryExists(FFolderPath+_sep_+MCA_file_path) then MCA_file_path:='';
             end;
         end;
@@ -117,23 +117,22 @@ begin
                 if WorldSetting.SaveJson then
                     tree.PrintJSON(Format('%s%stree[%d,%d].json',[FExportPath, _sep_, xPos, zPos]));
 
-
                 with DisplaySetting do begin
                     if (weoBiome in ExportOpts)
                       or (weoHeight in ExportOpts)
                       or (weoBlockPlan in ExportOpts)
                       or WorldSetting.SaveChk
                         then begin
-                            blk.LoadFromTree(tree);
+                            blk.LoadFromTree(tree, DisplaySetting.Palette);
                             if WorldSetting.SaveChk then
                                 blk.SaveByteToFile(Format('%s%sblocks[%d,%d].chk',[FExportPath, _sep_, xPos, zPos]));
                         end;
                     if weoBlockPlan in ExportOpts then
-                        FBlockPlan.GetChunkPlan(blk, Projection, ClipFloor, Byte(smExclude), PSelection);
+                        FBlockPlan.Projection(blk, Projection, ClipFloor, Palette);
                     if weoHeight in ExportOpts then
-                        FBlockHeight.GetChunkPlan(blk, 'height');
+                        FBlockHeight.Projection(blk, 'height');
                     if weoBiome in ExportOpts then
-                        FBlockBiome.GetChunkPlan(blk, 'biomes');
+                        FBlockBiome.Projection(blk, 'biomes');
                     if weoTileEnts in ExportOpts then
                         FTileEnts.LoadFromTree(tree);
                     if weoEntities in ExportOpts then
@@ -288,7 +287,10 @@ begin
         ExportOpts := [weoBlockPlan, weoBiome, weoHeight, weoEntities, weoTileEnts];
         Projection := 'below';
         ClipFloor  := 127;
-        PSelection := TSelectionRule.Create;
+        Palette    := TMC_Palette.Create;
+        Palette.AddBlockRejection('minecraft:air');
+        Palette.AddBlockRejection('minecraft:cave_air');
+        Palette.AddBlockRejection('minecraft:void_air');
     end;
     FEntities      := TEntities.Create;
     FTileEnts      := TEntities.Create;
@@ -305,7 +307,7 @@ end;
 
 destructor TMC_World.Destroy;
 begin
-    DisplaySetting.PSelection.Free;
+    DisplaySetting.Palette.Free;
     FEntities.Free;
     FTileEnts.Free;
     FBlockPlan.Free;

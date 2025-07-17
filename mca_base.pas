@@ -6,7 +6,7 @@ unit mca_base;
 interface
 
 uses
-  Classes, SysUtils, apiglio_tree, blocks_definition, Zstream;
+  Classes, SysUtils, apiglio_tree, blocks_definition, mc_palette, Zstream;
 
 type
   TMCA_Stream=class
@@ -110,12 +110,12 @@ type
     function ExtractBiomes_1_18(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractBlocks_164(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractBlocks_1_13(tree:TATree):boolean;//仅接受唯一（第1个）chunk
-    function ExtractBlocks_1_18(tree:TATree):boolean;//仅接受唯一（第1个）chunk
+    function ExtractBlocks_1_18(tree:TATree;palette:TMC_Palette):boolean;//仅接受唯一（第1个）chunk
     function ExtractHeightMap_164(tree:TATree):boolean;//仅接受唯一（第1个）chunk
     function ExtractHeightMap_1_13(tree:TATree):boolean;//仅接受唯一（第1个）chunk
 
   public
-    function LoadFromTree(tree:TATree):boolean;
+    function LoadFromTree(tree:TATree;palette:TMC_Palette):boolean;
     procedure SaveToFile(filename:string);
     procedure SaveByteToFile(filename:string);
     procedure SaveHeightMapToFile(filename:string);
@@ -717,11 +717,13 @@ begin
   result:=true;
 end;
 
-function TChunk_Block.ExtractBlocks_1_18(tree:TATree):boolean;
+function TChunk_Block.ExtractBlocks_1_18(tree:TATree;palette:TMC_Palette):boolean;
 var tmp,palette_unit:TAListUnit;
     SectionsId:ShortInt;
     palette_count,pi:dword;
-    block_defs:array[0..4095]of integer;
+    block_name:string;
+    //block_defs:array[0..4095]of integer;
+    adapter:TMC_Block;
     band,buffer,bindex:int64;
     btimes,bsh:byte;
     mem:pbyte;
@@ -742,7 +744,10 @@ begin
 
   while FStream.position<FStream.Size do FStream.WriteQWord($0000000000000000);
   while FSBelow.position<FSBelow.Size do FSBelow.WriteQWord($0000000000000000);
-  defaultBlocks.AddBlockId('minecraft:air');//强制设置0为空气方块
+  //defaultBlocks.AddBlockId('minecraft:air');//强制设置0为空气方块
+
+  //强制设置0为空气方块
+  palette.AddBlock('minecraft:air');
 
   tree.CurrentInto(tree.root.Achild.first.obj as TATreeUnit);
   tree.CurrentInto('Level'); //21w43a之后Level取消，可进可不进
@@ -758,13 +763,19 @@ begin
       if not tree.CurrentInto('block_states') then raise Exception.Create('block_states');
       if tree.CurrentInto('palette') then
         begin
+          writeln('number of palette: ',tree.Current.Achild.count);
+          palette.ClearSectionPatette;
           palette_unit:=tree.Current.Achild.first;
           pi:=0;
           while palette_unit<>nil do
             begin
               tree.CurrentInto(palette_unit.obj as TATreeUnit);
               tree.CurrentInto('Name');
-              block_defs[pi]:=defaultBlocks.AddBlockId(tree.Current.AString);
+              block_name:=tree.Current.AString;
+              palette.AddBlock(block_name);
+              palette.AppendSectionPatette(block_name);
+              writeln('univ: ',palette.BlockListSize,'  sect: ',palette.SectionsSize,'  blockname:',block_name);
+              //block_defs[pi]:=defaultBlocks.AddBlockId(tree.Current.AString);
               inc(pi);
               palette_unit:=palette_unit.next;
             end;
@@ -773,13 +784,14 @@ begin
       else
         begin
           //没有方块索引的子区块直接退出，相当于全部是minecraft:air
-          block_defs[0]:=defaultBlocks.AddBlockId('minecraft:air');
+          //block_defs[0]:=defaultBlocks.AddBlockId('minecraft:air');
+          adapter:=palette.FindBlock('minecraft:air')^.GetValue_Raw;
           if SectionsId>=0 then begin
             FStream.position:=SectionsId*4096*4+0;
-            for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+            for pi:=0 to 4095 do FStream.WriteDWord(adapter.vDWord);
           end else begin
             FSBelow.position:=(-SectionsId-1)*4096*4+0;
-            for pi:=0 to 4095 do FSBelow.WriteDWord(block_defs[0]);
+            for pi:=0 to 4095 do FSBelow.WriteDWord(adapter.vDWord);
           end;
           tmp:=tmp.next;
           continue;
@@ -790,12 +802,13 @@ begin
       tree.CurrentOut;//Sections
 
       if not tree.CurrentInto('data') then begin
+        adapter:=palette.FindBlockBySectionId(0)^.GetValue_Raw;
         if SectionsId>=0 then begin
           FStream.position:=SectionsId*4096*4+0;
-          for pi:=0 to 4095 do FStream.WriteDWord(block_defs[0]);
+          for pi:=0 to 4095 do FStream.WriteDWord(adapter.vDWord);
         end else begin
           FSBelow.position:=(-SectionsId-1)*4096*4+0;
-          for pi:=0 to 4095 do FSBelow.WriteDWord(block_defs[0]);
+          for pi:=0 to 4095 do FSBelow.WriteDWord(adapter.vDWord);
         end;
         tmp:=tmp.next;
         continue; // 无data就用Palette[0]填充整个子区块
@@ -834,7 +847,8 @@ begin
             buffer:=tree.Current.RLongArray[pi];
             for bindex:=0 to btimes do
               begin
-                pStream.WriteDWord(block_defs[buffer and band] shl 8);
+                //pStream.WriteDWord(block_defs[buffer and band] shl 8);
+                pStream.WriteDWord(palette.FindBlockBySectionId(buffer and band)^.GetValue_Raw.vDWord);
                 buffer:=buffer shr bsh;
               end;
           end;
@@ -1097,12 +1111,11 @@ begin
   result:=true;
 end;
 
-function TChunk_Block.LoadFromTree(tree:TATree):boolean;
+function TChunk_Block.LoadFromTree(tree:TATree;palette:TMC_Palette):boolean;
 begin
   result:=false;
   if not OnlyOneChunk(tree) then exit;
   ExtractChunkPos(tree);
-
   if HasPalette(tree) then begin //Sections[*]中有Palette
     //if not ExtractBiomes_1_13(tree) then exit;
     exit;
@@ -1111,7 +1124,6 @@ begin
   end else begin
     if not ExtractBiomes_164(tree) then exit;
   end;
-
 
   if HasHeightMaps(tree) then begin
     if not ExtractHeightMap_1_13(tree) then exit;
@@ -1122,7 +1134,7 @@ begin
   if HasPalette(tree) then begin //Sections[*]中有Palette
     if not ExtractBlocks_1_13(tree) then exit;
   end else if HasBlockStates(tree) then begin
-    if not ExtractBlocks_1_18(tree) then exit;
+    if not ExtractBlocks_1_18(tree, palette) then exit;
   end else begin
     if not ExtractBlocks_164(tree) then exit;
   end;
