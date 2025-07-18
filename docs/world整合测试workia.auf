@@ -1,7 +1,8 @@
 var object w
-world.new  @w, "F:\Apiglio\LazarusProject\MCA_Reader\MCA\热带海湾 - 202507131234"
-world.setprj @w, "below"
+world.new      @w, "F:\Apiglio\LazarusProject\MCA_Reader\MCA\热带海湾 - 202507131234"
+world.setprj   @w, "below"
 world.setfloor @w, 51
+world.setdim   @w, TheNether
 
 world.read @w
 world.save @w

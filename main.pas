@@ -1199,6 +1199,49 @@ begin
   end;
 end;
 
+procedure Func_clearWorldRejection(Sender:TObject);
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(2) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  (obj as TMC_World).DisplaySetting.Palette.ClearBlockRejection;
+end;
+
+procedure Func_addWorldRejection(Sender:TObject);
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+    block_name:string;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  if not AAuf.TryArgToString(2, block_name) then exit;
+  (obj as TMC_World).DisplaySetting.Palette.AddBlockRejection(block_name);
+end;
+
+procedure Func_setModeWorldRejection(Sender:TObject);
+var AufScpt:TAufScript;
+    AAuf:TAuf;
+    obj:TObject;
+    mode:string;
+begin
+  AufScpt:=Sender as TAufScript;
+  AAuf:=AufScpt.Auf as TAuf;
+  if not AAuf.CheckArgs(3) then exit;
+  if not AAuf.TryArgToObject(1, TMC_World, obj) then exit;
+  if not AAuf.TryArgToStrParam(2, ['exclusive','preserve'], false, mode) then exit;
+  case lowercase(mode) of
+      'exclusive' : (obj as TMC_World).DisplaySetting.Palette.ReverseRejection:=false;
+      'preserve'  : (obj as TMC_World).DisplaySetting.Palette.ReverseRejection:=true;
+  end;
+end;
+
 procedure TFormMain.AufInit(scpt:TAufScript);
 begin
 
@@ -1269,7 +1312,12 @@ begin
     add_func('world.setprj',@Func_setWorldProjection,'@w, prj','设置存档的三维到二维的投影');
     add_func('world.setfloor',@Func_setWorldClipfloor,'@w, floor','设置存档的三维到二维的特征层');
     add_func('world.setdim',@Func_setWorldDimension,'@w, overworld/nether/end','设置存档读取维度');
-    add_func('world.setsave',@Func_setWorldSave,'@w, savefile, on/off','设置存档存档文件保存与否');
+    add_func('world.setsave',@Func_setWorldSave,'@w, savefile, on/off','设置存档分析过程文件保存与否');
+
+    add_func('world.rejection.clear',@Func_clearWorldRejection,'@w','清空存档方块过滤器');
+    add_func('world.rejection.add',@Func_addWorldRejection,'@w, block_name','在存档方块过滤器中添加项目');
+    add_func('world.rejection.mode',@Func_setModeWorldRejection,'@w','设置存档方块过滤器模式');
+
 
 
     //临时存在

@@ -10,18 +10,14 @@ uses
 
 type
 
-    TMC_Block = record
-        vDWord:dword;
-        function GetBlock:word;
-        function GetData:byte;
-        function GetNull:byte;
-        procedure SetBlock(block:word);
-        procedure SetData(data:byte);
-        procedure SetNull(nul:byte);
-    public
-        property vBlock:word read GetBlock write SetBlock;
-        property vData:byte read GetData write SetData;
-        property vNull:byte read GetNull write SetNull;
+    TMC_Block = record case integer of
+        0:(vDWord:dword); //RGBa = add blk dat nul
+        1:(vBands:array[0..3]of byte);
+        2:(
+           vBlock:word;
+           vData:byte;
+           vNull:byte
+           );
     end;
 
     TMC_PaletteRecord = record
@@ -69,37 +65,6 @@ type
     end;
 
 implementation
-
-
-function TMC_Block.GetBlock:word;
-begin
-    result:=vDWord shr 16;
-end;
-
-function TMC_Block.GetData:byte;
-begin
-    result:=(vDWord and $ffff) shr 8;
-end;
-
-function TMC_Block.GetNull:byte;
-begin
-    result:=vDWord and $ff;
-end;
-
-procedure TMC_Block.SetBlock(block:word);
-begin
-    vDWord:=(vDWord and $ffff) or (dword(block) shl 16);
-end;
-
-procedure TMC_Block.SetData(data:byte);
-begin
-    vDWord:=(vDWord and $ffff00ff) or (dword(data) shl 8);
-end;
-
-procedure TMC_Block.SetNull(nul:byte);
-begin
-    vDWord:=(vDWord and $ffffff00) or nul;
-end;
 
 function TMC_PaletteRecord.GetValue_Raw:TMC_Block;
 begin
